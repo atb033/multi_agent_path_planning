@@ -14,7 +14,7 @@ from bisect import bisect
 
 class SippGrid(object):
     def __init__(self):
-        self.position = ()
+        # self.position = ()
         self.interval_list = [(0, float('inf'))]
     def split_interval(self, t):
         for interval in self.interval_list:
@@ -35,7 +35,25 @@ class SippGrid(object):
 class SippGraph(object):
     def __init__(self, map):
         self.map = map
-        print(map["map"]["dimensions"])
+        self.dimensions = map["map"]["dimensions"]
+        self.obstacles = map["dynamic_obstacles"]
+        self.sipp_graph = {}
+        self.init_graph()
+
+    def init_graph(self):
+        for i in range(self.dimensions[0]):
+            for j in range(self.dimensions[1]):
+                grid_dict = {(i,j):SippGrid()}
+                self.sipp_graph.update(grid_dict)
+
+    def init_intervals(self):
+        for obstacle, schedule in self.obstacles.items():
+            for location in schedule:
+                position = (location["x"],location["y"])
+                t = location["t"]
+                self.sipp_graph[position].split_interval(t)
+                # print(str(position) + str(self.sipp_graph[position].interval_list))
+            
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -48,10 +66,5 @@ if __name__ == "__main__":
         except yaml.YAMLError as exc:
             print(exc)
 
-    grid = SippGrid()
-    print (grid.interval_list)
-    grid.split_interval(2)    
-    print (grid.interval_list)
-    grid.split_interval(3)    
-    print (grid.interval_list)
-    
+    graph = SippGraph(map)
+    graph.init_intervals()
