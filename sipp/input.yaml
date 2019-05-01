@@ -26,3 +26,13 @@ dynamic_obstacles:
     - x: 4
       y: 1
       t: 4
+    dyn_obst1:
+    - x: 2
+      y: 2
+      t: 0
+    - x: 2
+      y: 1
+      t: 1
+    - x: 2
+      y: 0
+      t: 2
