@@ -8,3 +8,21 @@ map:
     - !!python/tuple [0, 1]
     - !!python/tuple [2, 1]
     - !!python/tuple [3, 1]
+
+dynamic_obstacles:
+    dyn_obst0:
+    - x: 0
+      y: 1
+      t: 0
+    - x: 1
+      y: 1
+      t: 1
+    - x: 2
+      y: 1
+      t: 2
+    - x: 3
+      y: 1
+      t: 3
+    - x: 4
+      y: 1
+      t: 4
