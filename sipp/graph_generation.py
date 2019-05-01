@@ -52,10 +52,9 @@ class SippGraph(object):
                 position = (location["x"],location["y"])
                 t = location["t"]
                 self.sipp_graph[position].split_interval(t)
-                # print(str(position) + str(self.sipp_graph[position].interval_list))
-            
+                # print(str(position) + str(self.sipp_graph[position].interval_list))            
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("map", help="input file containing map and dynamic obstacles")
     args = parser.parse_args()
@@ -68,3 +67,8 @@ if __name__ == "__main__":
 
     graph = SippGraph(map)
     graph.init_intervals()
+
+
+if __name__ == "__main__":
+    main()
+
