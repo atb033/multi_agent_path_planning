@@ -12,12 +12,19 @@ import argparse
 import yaml
 from bisect import bisect
 
+class State(object):
+    def __init__(self, position=(-1,-1), t=0, interval=(0,float('inf'))):
+        self.position = tuple(position)
+        self.time = t
+        self.interval = interval
+
 class SippGrid(object):
     def __init__(self):
         # self.position = ()
         self.interval_list = [(0, float('inf'))]
         self.f = float('inf')
         self.g = float('inf')
+        self.parent_state = State()
 
     def split_interval(self, t):
         for interval in self.interval_list:

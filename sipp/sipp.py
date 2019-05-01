@@ -11,16 +11,9 @@ See the article: 10.1109/ICRA.2011.5980306
 import argparse
 import yaml
 from math import fabs
-from graph_generation import SippGraph, SippGrid
+from graph_generation import SippGraph, State
 
 # TODO: initialization of time interval in the first iteration
-
-class State(object):
-    def __init__(self, position, t=0, interval=(0,float('inf'))):
-        self.position = tuple(position)
-        self.time = t
-        self.interval = interval
-
 
 class SippPlanner(SippGraph):
     def __init__(self, map):
@@ -66,18 +59,46 @@ class SippPlanner(SippGraph):
             s = self.open.pop(min(self.open.keys()))
             successors = self.get_successors(s)
             for successor in successors:
-                if successor.position == self.goal:
-                    print("goal reached!!")
-                    goal_reached = True
-                    break
-
                 if self.sipp_graph[successor.position].g > self.sipp_graph[s.position].g + cost:
                     self.sipp_graph[successor.position].g = self.sipp_graph[s.position].g + cost
+                    self.sipp_graph[successor.position].parent_state = s
+                    # print(self.sipp_graph[successor.position].parent_state.position)
+
+                    if successor.position == self.goal:
+                        print("goal reached!!")
+                        goal_reached = True
+                        break
+
                     # TODO: Update time as per publication: but this is already done 
                     # in get_successors(). Not sure how to proceed
                     self.sipp_graph[successor.position].f = self.sipp_graph[successor.position].g + self.get_heuristic(successor.position)
                     self.open.update({self.sipp_graph[successor.position].f:successor})
                 # print(successor.position)
+            if self.open == []: 
+                print("Plan not found")
+                return 0
+        # Tracking back
+        start_reached = False
+        self.plan = []
+        current = successor
+        while not start_reached:
+            self.plan.insert(0,current)
+            if current.position == self.start:
+                # print("reached start")
+                # print("the path is: " + str(plan))
+                start_reached = True
+            current = self.sipp_graph[current.position].parent_state
+        return 1
+            
+    def get_plan(self):
+        path_list = []
+        for setpoint in self.plan:
+            temp_dict = {"x":setpoint.position[0], "y":setpoint.position[1], "t":setpoint.time}
+            path_list.append(temp_dict)
+        data = {"agent":path_list}
+        print(data)
+
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -92,9 +113,8 @@ def main():
             print(exc)
 
     sipp_planner = SippPlanner(map)
-    # s = State((4,2),3)
-    # sipp_planner.get_successor(s)
-    sipp_planner.compute_plan()
+    if sipp_planner.compute_plan():
+        plan = sipp_planner.get_plan()
 
 if __name__ == "__main__":
     main()
