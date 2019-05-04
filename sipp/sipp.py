@@ -16,10 +16,11 @@ from graph_generation import SippGraph, State
 # TODO: initialization of time interval in the first iteration
 
 class SippPlanner(SippGraph):
-    def __init__(self, map):
+    def __init__(self, map, agent_id):
         SippGraph.__init__(self, map)
-        self.start = tuple(map["agents"][0]["start"])
-        self.goal = tuple(map["agents"][0]["goal"])
+        self.start = tuple(map["agents"][agent_id]["start"])
+        self.goal = tuple(map["agents"][agent_id]["goal"])
+        self.name = map["agents"][agent_id]["name"]
         self.open = []
 
     def get_successors(self, state):
@@ -56,8 +57,12 @@ class SippPlanner(SippGraph):
         self.open.update({f_start:s_start})
 
         while (not goal_reached):
+            if self.open == {}: 
+                # Plan not found
+                return 0
             s = self.open.pop(min(self.open.keys()))
             successors = self.get_successors(s)
+    
             for successor in successors:
                 if self.sipp_graph[successor.position].g > self.sipp_graph[s.position].g + cost:
                     self.sipp_graph[successor.position].g = self.sipp_graph[s.position].g + cost
@@ -65,7 +70,7 @@ class SippPlanner(SippGraph):
                     # print(self.sipp_graph[successor.position].parent_state.position)
 
                     if successor.position == self.goal:
-                        print("goal reached!!")
+                        print("Plan successfully calculated!!")
                         goal_reached = True
                         break
 
@@ -74,9 +79,6 @@ class SippPlanner(SippGraph):
                     self.sipp_graph[successor.position].f = self.sipp_graph[successor.position].g + self.get_heuristic(successor.position)
                     self.open.update({self.sipp_graph[successor.position].f:successor})
                 # print(successor.position)
-            if self.open == []: 
-                print("Plan not found")
-                return 0
         # Tracking back
         start_reached = False
         self.plan = []
@@ -92,17 +94,34 @@ class SippPlanner(SippGraph):
             
     def get_plan(self):
         path_list = []
-        for setpoint in self.plan:
+
+        # first setpoint
+        setpoint = self.plan[0]
+        temp_dict = {"x":setpoint.position[0], "y":setpoint.position[1], "t":setpoint.time}
+        path_list.append(temp_dict)
+
+        for i in range(len(self.plan)-1):
+            for j in range(self.plan[i+1].time - self.plan[i].time-1):
+                x = self.plan[i].position[0]
+                y = self.plan[i].position[1]
+                t = self.plan[i].time
+                setpoint = self.plan[i]
+                temp_dict = {"x":x, "y":y, "t":t+j+1}
+                path_list.append(temp_dict)
+
+            setpoint = self.plan[i+1]
             temp_dict = {"x":setpoint.position[0], "y":setpoint.position[1], "t":setpoint.time}
             path_list.append(temp_dict)
-        data = {"agent":path_list}
-        print(data)
+
+        data = {self.name:path_list}
+        return data
 
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("map", help="input file containing map and dynamic obstacles")
+    parser.add_argument("output", help="output file with the schedule")
     
     args = parser.parse_args()
     
@@ -112,9 +131,22 @@ def main():
         except yaml.YAMLError as exc:
             print(exc)
 
-    sipp_planner = SippPlanner(map)
+    with open(args.output, 'r') as output_yaml:
+        try:
+            output = yaml.load(output_yaml, Loader=yaml.FullLoader)
+        except yaml.YAMLError as exc:
+            print(exc)
+
+    sipp_planner = SippPlanner(map,0)
+
     if sipp_planner.compute_plan():
         plan = sipp_planner.get_plan()
+        output["schedule"].update(plan)
+        with open(args.output, 'w') as output_yaml:
+            yaml.safe_dump(output, output_yaml)  
+    else: 
+        print("Plan not found")
+
 
 if __name__ == "__main__":
     main()
