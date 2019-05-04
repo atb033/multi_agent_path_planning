@@ -26,29 +26,42 @@ class SippGrid(object):
         self.g = float('inf')
         self.parent_state = State()
 
-    def split_interval(self, t):
+    def split_interval(self, t, last_t = False):
+        """
+        Function to generate safe-intervals
+        """
         for interval in self.interval_list:
-            if t == interval[0]:
-                self.interval_list.remove(interval)
-                if t+1 <= interval[1]:
+            if last_t:
+                if t<=interval[0]:
+                    self.interval_list.remove(interval)
+                elif t>interval[1]:
+                    continue
+                else:
+                    self.interval_list.remove(interval)
+                    self.interval_list.append((interval[0], t-1))
+            else:
+                if t == interval[0]:
+                    self.interval_list.remove(interval)
+                    if t+1 <= interval[1]:
+                        self.interval_list.append((t+1, interval[1]))
+                elif t == interval[1]:
+                    self.interval_list.remove(interval)
+                    if t-1 <= interval[0]:
+                        self.interval_list.append((interval[0],t-1))
+                elif bisect(interval,t) == 1:
+                    self.interval_list.remove(interval)
+                    self.interval_list.append((interval[0], t-1))
                     self.interval_list.append((t+1, interval[1]))
-            elif t == interval[1]:
-                self.interval_list.remove(interval)
-                if t-1 <= interval[0]:
-                    self.interval_list.append((interval[0],t-1))
-            elif bisect(interval,t) == 1:
-                self.interval_list.remove(interval)
-                self.interval_list.append((interval[0], t-1))
-                self.interval_list.append((t+1, interval[1]))
             self.interval_list.sort()
 
 class SippGraph(object):
     def __init__(self, map):
         self.map = map
         self.dimensions = map["map"]["dimensions"]
-        self.obstacles = [tuple(v) for v in map["map"]["obstacles"]]
-        
+
+        self.obstacles = [tuple(v) for v in map["map"]["obstacles"]]        
         self.dyn_obstacles = map["dynamic_obstacles"]
+
         self.sipp_graph = {}
         self.init_graph()
         self.init_intervals()
@@ -60,11 +73,17 @@ class SippGraph(object):
                 self.sipp_graph.update(grid_dict)
 
     def init_intervals(self):
+        if not self.dyn_obstacles: return
         for schedule in self.dyn_obstacles.values():
-            for location in schedule:
+            # for location in schedule:
+            for i in range(len(schedule)):
+                location = schedule[i]
+                last_t = i == len(schedule)-1
+
                 position = (location["x"],location["y"])
                 t = location["t"]
-                self.sipp_graph[position].split_interval(t)
+
+                self.sipp_graph[position].split_interval(t, last_t)
                 # print(str(position) + str(self.sipp_graph[position].interval_list))     
 
     def is_valid_position(self, position):
@@ -104,7 +123,8 @@ def main():
 
     graph = SippGraph(map)
     # print(graph.get_valid_neighbours((0,0)))
-    print(graph.sipp_graph[(1,1)].interval_list)
+    # print(graph.sipp_graph[(1,1)].interval_list)
+    # print(graph.get_valid_neighbours((1,2)))
 
 if __name__ == "__main__":
     main()
