@@ -12,10 +12,20 @@ import argparse
 import yaml
 from bisect import bisect
 
+class State(object):
+    def __init__(self, position=(-1,-1), t=0, interval=(0,float('inf'))):
+        self.position = tuple(position)
+        self.time = t
+        self.interval = interval
+
 class SippGrid(object):
     def __init__(self):
         # self.position = ()
         self.interval_list = [(0, float('inf'))]
+        self.f = float('inf')
+        self.g = float('inf')
+        self.parent_state = State()
+
     def split_interval(self, t):
         for interval in self.interval_list:
             if t == interval[0]:
@@ -36,9 +46,12 @@ class SippGraph(object):
     def __init__(self, map):
         self.map = map
         self.dimensions = map["map"]["dimensions"]
-        self.obstacles = map["dynamic_obstacles"]
+        self.obstacles = [tuple(v) for v in map["map"]["obstacles"]]
+        
+        self.dyn_obstacles = map["dynamic_obstacles"]
         self.sipp_graph = {}
         self.init_graph()
+        self.init_intervals()
 
     def init_graph(self):
         for i in range(self.dimensions[0]):
@@ -47,16 +60,40 @@ class SippGraph(object):
                 self.sipp_graph.update(grid_dict)
 
     def init_intervals(self):
-        for obstacle, schedule in self.obstacles.items():
+        for schedule in self.dyn_obstacles.values():
             for location in schedule:
                 position = (location["x"],location["y"])
                 t = location["t"]
                 self.sipp_graph[position].split_interval(t)
-                # print(str(position) + str(self.sipp_graph[position].interval_list))            
+                # print(str(position) + str(self.sipp_graph[position].interval_list))     
+
+    def is_valid_position(self, position):
+        dim_check = position[0] in range(self.dimensions[0]) and  position[1] in range(self.dimensions[1])
+        obs_check = position not in self.obstacles
+        # print(dim_check)
+        return dim_check and obs_check
+
+    def get_valid_neighbours(self, position):
+        neighbour_list = []
+
+        up = (position[0], position[1]+1)
+        if self.is_valid_position(up): neighbour_list.append(up)
+
+        down = (position[0], position[1]-1)
+        if self.is_valid_position(down): neighbour_list.append(down)
+
+        left = (position[0]-1, position[1])
+        if self.is_valid_position(left): neighbour_list.append(left)
+
+        right = (position[0]+1, position[1])
+        if self.is_valid_position(right): neighbour_list.append(right)
+
+        return neighbour_list
+
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("map", help="input file containing map and dynamic obstacles")
+    parser.add_argument("map", help="input file containing map and dynamic dyn_obstacles")
     args = parser.parse_args()
     
     with open(args.map, 'r') as map_file:
@@ -66,8 +103,8 @@ def main():
             print(exc)
 
     graph = SippGraph(map)
-    graph.init_intervals()
-
+    # print(graph.get_valid_neighbours((0,0)))
+    print(graph.sipp_graph[(1,1)].interval_list)
 
 if __name__ == "__main__":
     main()
