@@ -37,14 +37,13 @@ class SippPlanner(SippGraph):
                 time = max(start_t, i[0]) 
                 s = State(neighbour, time, i)
                 successors.append(s)
-                # print(str(s.position) + str(s.interval))
         return successors
 
     def get_heuristic(self, position):
         return fabs(position[0] - self.goal[0]) + fabs(position[1]-self.goal[1])
 
     def compute_plan(self):
-        self.open = {}
+        self.open = []
         goal_reached = False
         cost = 1
 
@@ -54,13 +53,13 @@ class SippPlanner(SippGraph):
         f_start = self.get_heuristic(self.start)
         self.sipp_graph[self.start].f = f_start
 
-        self.open.update({f_start:s_start})
+        self.open.append((f_start, s_start))
 
         while (not goal_reached):
             if self.open == {}: 
                 # Plan not found
                 return 0
-            s = self.open.pop(min(self.open.keys()))
+            s = self.open.pop(0)[1]
             successors = self.get_successors(s)
     
             for successor in successors:
@@ -77,8 +76,9 @@ class SippPlanner(SippGraph):
                     # TODO: Update time as per publication: but this is already done 
                     # in get_successors(). Not sure how to proceed
                     self.sipp_graph[successor.position].f = self.sipp_graph[successor.position].g + self.get_heuristic(successor.position)
-                    self.open.update({self.sipp_graph[successor.position].f:successor})
-                # print(successor.position)
+
+                    self.open.append((self.sipp_graph[successor.position].f, successor))
+
         # Tracking back
         start_reached = False
         self.plan = []
@@ -86,8 +86,6 @@ class SippPlanner(SippGraph):
         while not start_reached:
             self.plan.insert(0,current)
             if current.position == self.start:
-                # print("reached start")
-                # print("the path is: " + str(plan))
                 start_reached = True
             current = self.sipp_graph[current.position].parent_state
         return 1
@@ -137,6 +135,7 @@ def main():
         except yaml.YAMLError as exc:
             print(exc)
 
+    # compute first plan
     sipp_planner = SippPlanner(map,0)
 
     if sipp_planner.compute_plan():
