@@ -13,8 +13,6 @@ import yaml
 from math import fabs
 from graph_generation import SippGraph, State
 
-# TODO: initialization of time interval in the first iteration
-
 class SippPlanner(SippGraph):
     def __init__(self, map, agent_id):
         SippGraph.__init__(self, map)
@@ -66,17 +64,13 @@ class SippPlanner(SippGraph):
                 if self.sipp_graph[successor.position].g > self.sipp_graph[s.position].g + cost:
                     self.sipp_graph[successor.position].g = self.sipp_graph[s.position].g + cost
                     self.sipp_graph[successor.position].parent_state = s
-                    # print(self.sipp_graph[successor.position].parent_state.position)
 
                     if successor.position == self.goal:
                         print("Plan successfully calculated!!")
                         goal_reached = True
                         break
 
-                    # TODO: Update time as per publication: but this is already done 
-                    # in get_successors(). Not sure how to proceed
                     self.sipp_graph[successor.position].f = self.sipp_graph[successor.position].g + self.get_heuristic(successor.position)
-
                     self.open.append((self.sipp_graph[successor.position].f, successor))
 
         # Tracking back
