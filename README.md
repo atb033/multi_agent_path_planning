@@ -1,7 +1,7 @@
 # Multi-Agent path planning in python
  
  ## Methods implemented:
- * Safe-Interval Path Planning (10.1109/ICRA.2011.5980306)
+ * Safe-Interval Path Planning (DOI: 10.1109/ICRA.2011.5980306)
 
 ## Run test
 
