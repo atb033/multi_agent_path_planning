@@ -65,9 +65,6 @@ class Environment(object):
 
         self.constraints = Constraints()
 
-        vcon = VertexConstraint(2, Location(1,0))
-        self.constraints.vertex_constraints.append(vcon)
-
     def get_neighbors(self, state):
         neighbors = []
         
@@ -106,7 +103,8 @@ class Environment(object):
     def state_valid(self, state):
         return state.location.x >= 0 and state.location.x < self.dimension[0] \
             and state.location.y >= 0 and state.location.y < self.dimension[1] \
-            and VertexConstraint(state.time, state.location) not in self.constraints.vertex_constraints
+            and VertexConstraint(state.time, state.location) not in self.constraints.vertex_constraints \
+            and (state.location.x, state.location.y) not in self.obstacles
 
     def transition_valid(self, state_1, state_2):
         return EdgeConstraint(state_1.time, state_1.location, state_2.location) not in self.constraints.edge_constraints
@@ -129,7 +127,11 @@ def main():
     dimension = map["map"]["dimensions"]
     obstacles = map["map"]["obstacles"]
     env = Environment(dimension, obstacles)
+
     s1 = State(1,1,1)
+    vcon = VertexConstraint(2, Location(1,0))
+    env.constraints.vertex_constraints.append(vcon)
+
     for n in env.get_neighbors(s1):
         print(n)
     
