@@ -1,15 +1,21 @@
 schedule:
   agent0:
   - t: 0
-    x: 1
-    y: 1
+    x: 0
+    y: 2
   - t: 1
     x: 1
-    y: 1
+    y: 2
   - t: 2
     x: 1
-    y: 0
+    y: 2
   - t: 3
+    x: 1
+    y: 1
+  - t: 4
+    x: 1
+    y: 0
+  - t: 5
     x: 2
     y: 0
   agent1:
@@ -20,8 +26,11 @@ schedule:
     x: 1
     y: 0
   - t: 2
-    x: 2
-    y: 0
+    x: 1
+    y: 1
   - t: 3
-    x: 3
-    y: 0
+    x: 1
+    y: 2
+  - t: 4
+    x: 2
+    y: 2
