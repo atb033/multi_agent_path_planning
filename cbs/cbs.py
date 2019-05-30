@@ -1,10 +1,8 @@
 """
 
-Graph generation for sipp 
+Python implementation of Conflict-based search
 
 author: Ashwin Bose (@atb033)
-
-See the article: 10.1109/ICRA.2011.5980306
 
 """
 
@@ -12,6 +10,7 @@ import argparse
 import yaml
 from enum import Enum, auto
 from math import fabs
+from a_star import AStar
 
 class Location(object):
     def __init__(self, x, y):
@@ -74,6 +73,8 @@ class Environment(object):
 
         self.constraints = Constraints()
 
+        self.a_star = AStar(self)
+
     def get_neighbors(self, state):
         neighbors = []
         
@@ -125,69 +126,6 @@ class Environment(object):
         goal = self.agent_dict[agent_name]["goal"]
         return fabs(state.location.x - goal.location.x) + fabs(state.location.y - goal.location.y)
 
-    def a_star_search(self, agent_name):
-        """
-        low level search 
-        """
-        initial_state = self.agent_dict[agent_name]["start"]
-        step_cost = 1
-        
-        closed_set = set()
-        open_set = {initial_state}
-
-        came_from = {}
-
-        g_score = {} # default infinity
-        g_score[initial_state] = 0
-
-        f_score = {} # default infinity
-
-        f_score[initial_state] = self.admissible_heuristic(initial_state, agent_name)
-
-        counter = 0
-    
-        while open_set:
-            print(counter)
-            counter+=1
-
-            temp_dict = {open_item:f_score.setdefault(open_item, float("inf")) for open_item in open_set}
-            current = min(temp_dict, key=temp_dict.get)
-            print(current)
-            if self.is_at_goal(current, agent_name):
-                print("goal reached")
-                path = self.reconstruct_path(came_from, current)
-                for state in path:
-                    print(state)
-                return self.reconstruct_path(came_from, current)
-
-            open_set -= {current}
-            closed_set |= {current}
-
-            neighbor_list = self.get_neighbors(current)
-
-            for neighbor in neighbor_list:
-                print("neighbor: " + str(neighbor))
-                if neighbor in closed_set:
-                    continue
-                
-                tentative_g_score = g_score.setdefault(current, float("inf")) + step_cost
-
-                if neighbor not in open_set:
-                    open_set |= {neighbor}
-                elif tentative_g_score >= g_score.setdefault(neighbor, float("inf")):
-                    continue
-
-                came_from[neighbor] = current
-
-                g_score[neighbor] = tentative_g_score
-                f_score[neighbor] = g_score[neighbor] + self.admissible_heuristic(neighbor, agent_name)
-
-    def reconstruct_path(self, came_from, current):
-        total_path = [current]
-        while current in came_from.keys():
-            current = came_from[current]
-            total_path.append(current)
-        return total_path[::-1]
 
     def is_at_goal(self, state, agent_name):
         goal_state = self.agent_dict[agent_name]["goal"]
@@ -225,7 +163,7 @@ def main():
     # for n in env.get_neighbors(s1):
     #     print(n)
     
-    env.a_star_search('agent0')
+    env.a_star.search('agent0')
 
 if __name__ == "__main__":
     main()
