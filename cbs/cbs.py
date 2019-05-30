@@ -64,6 +64,7 @@ class VertexConstraint():
         return hash(str(self.time)+str(self.location))        
     def __str__(self):
         return '(' + str(self.time) + ', '+ str(self.location) + ')' 
+
 class EdgeConstraint(object):
     def __init__(self, time, location_1, location_2):
         self.time = time
@@ -74,6 +75,8 @@ class EdgeConstraint(object):
             and self.location_2 == other.location_2
     def __hash__(self):
         return hash(str(self.time) + str(self.location_1) + str(self.location_2))
+    def __str__(self):
+        return '(' + str(self.time) + ', '+ str(self.location_1) +', '+ str(self.location_2) + ')' 
 
 class Constraints(object):
     def __init__(self):
@@ -83,10 +86,10 @@ class Constraints(object):
     def add_constraint(self, other):
         self.vertex_constraints |= other.vertex_constraints
         self.edge_constraints |= other.edge_constraints
-        # print(self.vertex_constraints)
 
     def __str__(self):
-        return str([str(vc) for vc in self.vertex_constraints])
+        return "VC: " + str([str(vc) for vc in self.vertex_constraints])  + \
+            "EC: " + str([str(ec) for ec in self.edge_constraints])
 
 class Environment(object):
     def __init__(self, dimension, agents, obstacles):
@@ -143,7 +146,22 @@ class Environment(object):
                     result.agent_1 = agent_1
                     result.agent_2 = agent_2
                     return result
-        
+
+            for agent_1, agent_2 in combinations(solution.keys(), 2):
+                state_1a = self.get_state(agent_1, solution, t)
+                state_1b = self.get_state(agent_1, solution, t+1)
+
+                state_2a = self.get_state(agent_2, solution, t)
+                state_2b = self.get_state(agent_2, solution, t+1)
+
+                if state_1a.is_equal_except_time(state_2b) and state_1b.is_equal_except_time(state_2a):
+                    result.time = t
+                    result.type = Conflict.EDGE
+                    result.agent_1 = agent_1
+                    result.agent_2 = agent_2
+                    result.location_1 = state_1a.location
+                    result.location_2 = state_1b.location
+                    return result                
         return False
 
     def create_constraints_from_conflict(self, conflict):
@@ -154,6 +172,19 @@ class Environment(object):
             constraint.vertex_constraints |= {v_constraint}
             constraint_dict[conflict.agent_1] = constraint
             constraint_dict[conflict.agent_2] = constraint
+        
+        elif conflict.type == Conflict.EDGE:
+            constraint1 = Constraints()
+            constraint2 = Constraints()
+
+            e_constraint1 = EdgeConstraint(conflict.time, conflict.location_1, conflict.location_2)
+            e_constraint2 = EdgeConstraint(conflict.time, conflict.location_2, conflict.location_1)
+        
+            constraint1.edge_constraints |= {e_constraint1}
+            constraint2.edge_constraints |= {e_constraint2}
+
+            constraint_dict[conflict.agent_1] = constraint1
+            constraint_dict[conflict.agent_2] = constraint2
 
         return constraint_dict
 
@@ -238,7 +269,7 @@ class CBS(object):
                 return self.generate_plan(P.solution)
 
             constraint_dict = self.env.create_constraints_from_conflict(conflict_dict)
-            
+
             for agent in constraint_dict.keys():
                 new_node = deepcopy(P)
                 new_node.constraint_dict[agent].add_constraint(constraint_dict[agent]) 
