@@ -26,7 +26,10 @@ class State(object):
     def __init__(self, time, x, y):
         self.time = time
         self.location = Location(x, y)
-
+    def __eq__(self, other):
+        return self.time == other.time and self.location == other.location
+    def __hash__(self):
+        return hash(str(self.time)+str(self.location.x) + str(self.location.y))
     def is_equal_except_time(self, state):
         return self.location == state.location
     def __str__(self):
@@ -63,9 +66,11 @@ class Environment(object):
     def __init__(self, dimension, agents, obstacles):
         self.dimension = dimension
         self.obstacles = obstacles
-        self.agents = agents
 
-        self.make_agent_goal_dict()
+        self.agents = agents
+        self.agent_dict = {}
+
+        self.make_agent_dict()
 
         self.constraints = Constraints()
 
@@ -113,27 +118,87 @@ class Environment(object):
     def transition_valid(self, state_1, state_2):
         return EdgeConstraint(state_1.time, state_1.location, state_2.location) not in self.constraints.edge_constraints
 
-    def is_solution(self):
+    def is_solution(self, agent_name):
         pass
 
     def admissible_heuristic(self, state, agent_name):
-        goal = self.agent_goal_dict[agent_name]
-        return fabs(state.location.x - goal[0]) + fabs(state.location.y - goal[1])
+        goal = self.agent_dict[agent_name]["goal"]
+        return fabs(state.location.x - goal.location.x) + fabs(state.location.y - goal.location.y)
 
-    def a_star_search(self, initial_state, goal_state):
+    def a_star_search(self, agent_name):
         """
         low level search 
         """
-        closed_set = []
-        open_set = [initial_state]
+        initial_state = self.agent_dict[agent_name]["start"]
+        step_cost = 1
+        
+        closed_set = set()
+        open_set = {initial_state}
 
         came_from = {}
-        
 
-    def make_agent_goal_dict(self):
-        self.agent_goal_dict = {}
+        g_score = {} # default infinity
+        g_score[initial_state] = 0
+
+        f_score = {} # default infinity
+
+        f_score[initial_state] = self.admissible_heuristic(initial_state, agent_name)
+
+        counter = 0
+    
+        while open_set:
+            print(counter)
+            counter+=1
+
+            temp_dict = {open_item:f_score.setdefault(open_item, float("inf")) for open_item in open_set}
+            current = min(temp_dict, key=temp_dict.get)
+            print(current)
+            if self.is_at_goal(current, agent_name):
+                print("goal reached")
+                path = self.reconstruct_path(came_from, current)
+                for state in path:
+                    print(state)
+                return self.reconstruct_path(came_from, current)
+
+            open_set -= {current}
+            closed_set |= {current}
+
+            neighbor_list = self.get_neighbors(current)
+
+            for neighbor in neighbor_list:
+                print("neighbor: " + str(neighbor))
+                if neighbor in closed_set:
+                    continue
+                
+                tentative_g_score = g_score.setdefault(current, float("inf")) + step_cost
+
+                if neighbor not in open_set:
+                    open_set |= {neighbor}
+                elif tentative_g_score >= g_score.setdefault(neighbor, float("inf")):
+                    continue
+
+                came_from[neighbor] = current
+
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = g_score[neighbor] + self.admissible_heuristic(neighbor, agent_name)
+
+    def reconstruct_path(self, came_from, current):
+        total_path = [current]
+        while current in came_from.keys():
+            current = came_from[current]
+            total_path.append(current)
+        return total_path[::-1]
+
+    def is_at_goal(self, state, agent_name):
+        goal_state = self.agent_dict[agent_name]["goal"]
+        return state.is_equal_except_time(goal_state)
+
+    def make_agent_dict(self):
         for agent in self.agents:
-            self.agent_goal_dict.update({agent['name']:agent['goal']})
+            start_state = State(0, agent['start'][0], agent['start'][1])
+            goal_state = State(0, agent['goal'][0], agent['goal'][1])
+            
+            self.agent_dict.update({agent['name']:{'start':start_state, 'goal':goal_state}})
 
 def main():
     parser = argparse.ArgumentParser()
@@ -153,14 +218,14 @@ def main():
 
     env = Environment(dimension, agents, obstacles)
 
-    s1 = State(1,1,1)
-    vcon = VertexConstraint(2, Location(1,0))
+    # s1 = State(1,1,1)
+    vcon = VertexConstraint(1, Location(1,0))
     env.constraints.vertex_constraints.append(vcon)
 
-    for n in env.get_neighbors(s1):
-        print(n)
+    # for n in env.get_neighbors(s1):
+    #     print(n)
     
-
+    env.a_star_search('agent0')
 
 if __name__ == "__main__":
     main()
