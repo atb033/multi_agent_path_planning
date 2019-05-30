@@ -188,11 +188,11 @@ class Environment(object):
 
         return constraint_dict
 
-    def get_state(self, agend_name, solution, t):
-        if t < len(solution[agend_name]):
-            return solution[agend_name][t]
+    def get_state(self, agent_name, solution, t):
+        if t < len(solution[agent_name]):
+            return solution[agent_name][t]
         else:
-            return solution[agend_name][-1]
+            return solution[agent_name][-1]
 
     def state_valid(self, state):
         return state.location.x >= 0 and state.location.x < self.dimension[0] \
