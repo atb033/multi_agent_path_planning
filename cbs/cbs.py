@@ -10,10 +10,11 @@ import argparse
 import yaml
 from enum import Enum, auto
 from math import fabs
-from a_star import AStar
+from itertools import combinations
 
+from a_star import AStar
 class Location(object):
-    def __init__(self, x, y):
+    def __init__(self, x=-1, y=-1):
         self.x = x
         self.y = y
     def __eq__(self, other):
@@ -34,6 +35,22 @@ class State(object):
     def __str__(self):
         return str((self.time, self.location.x, self.location.y))
 
+class Conflict(object):
+    VERTEX = 1
+    EDGE = 2    
+    def __init__(self):
+        self.time = -1
+        self.type = -1
+
+        self.agent_1 = ''
+        self.agent_2 = ''
+    
+        self.location_1 = Location()
+        self.location_2 = Location()
+
+    def __str__(self):
+        return '(' + str(self.time) + ', '+ str(self.location_1) + ', ' + str(self.location_2) + ')'
+
 class VertexConstraint():
     def __init__(self, time, location):
         self.time = time
@@ -41,25 +58,28 @@ class VertexConstraint():
 
     def __eq__(self, other):
         return self.time == other.time and self.location == other.location
+    def __hash__(self):
+        return hash(str(self.time)+str(self.location))        
 
 class EdgeConstraint(object):
     def __init__(self, time, location_1, location_2):
         self.time = time
         self.location_1 = location_1
         self.location_2 = location_2
+    def __eq__(self, other):
+        return self.time == other.time and self.location_1 == other.location_1 \
+            and self.location_2 == other.location_2
+    def __hash__(self):
+        return hash(str(self.time) + str(self.location_1) + str(self.location_2))
 
 class Constraints(object):
     def __init__(self):
-        self.vertex_constraints = []
-        self.edge_constraints = []
+        self.vertex_constraints = set()
+        self.edge_constraints = set()
 
-# Chumma :P
-class Actions(Enum):
-    WAIT = auto()
-    UP = auto()
-    DOWN = auto()
-    LEFT = auto()
-    RIGHT = auto()
+    def __add__(self, other):
+        self.vertex_constraints |= other.vertex_constraints
+        self.edge_constraints |= other.edge_constraints
 
 class Environment(object):
     def __init__(self, dimension, agents, obstacles):
@@ -101,14 +121,39 @@ class Environment(object):
         return neighbors
 
         
-    def get_first_conflict(self):
-        pass
+    def get_first_conflict(self, solution):
+        max_t = max([len(plan) for plan in solution.values()])
+        result = Conflict()
+        for t in range(max_t):
+            for agent_1, agent_2 in combinations(solution.keys(), 2):
+                state_1 = self.get_state(agent_1, solution, t)
+                state_2 = self.get_state(agent_2, solution, t)
+                if state_1.is_equal_except_time(state_2):
+                    result.time = t
+                    result.type = Conflict.VERTEX
+                    result.location_1 = state_1.location
+                    result.agent_1 = agent_1
+                    result.agent_2 = agent_2
 
-    def create_constraints_from_conflict(self):
-        pass
+                    return result
+        
+        return False
 
-    def get_state(self, agend_id, solution, t):
-        pass
+    def create_constraints_from_conflict(self, conflict):
+        constraint_dict = {}
+        if conflict.type == Conflict.VERTEX:
+            constraint = VertexConstraint(conflict.time, conflict.location)
+            constraint_dict[conflict.agent_1] = constraint
+            constraint_dict[conflict.agent_2] = constraint
+
+        return constraint_dict
+
+
+    def get_state(self, agend_name, solution, t):
+        if t < len(solution[agend_name]):
+            return solution[agend_name][t]
+        else:
+            return solution[agend_name][-1]
 
     def state_valid(self, state):
         return state.location.x >= 0 and state.location.x < self.dimension[0] \
@@ -138,6 +183,52 @@ class Environment(object):
             
             self.agent_dict.update({agent['name']:{'start':start_state, 'goal':goal_state}})
 
+    def compute_solution(self):
+        solution = {}
+        for agent in self.agent_dict.keys():
+            solution.update({agent:self.a_star.search(agent)})
+        return solution
+
+    def compute_solution_cost(self, solution):
+        return sum([len(path) for path in solution.values()])
+
+class HighLevelNode(object):
+    def __init__(self):
+        self.solution = {}
+        self.constraints = Constraints()
+        self.cost = 0
+
+    def __lt__(self, other):
+        return self.cost < other.cost
+
+class CBS(object):
+    def __init__(self, environment):
+        self.env = environment 
+        self.open_list = []
+
+    def search(self):
+        start = HighLevelNode()
+        start.constraints = dict.fromkeys(self.env.agent_dict.keys(), Constraints())
+        start.solution = self.env.compute_solution()
+
+        return start.solution
+        start.cost = self.env.compute_solution_cost(start.solution)
+
+        self.open_list.append(start)
+
+        while self.open_list:
+            P = min(self.open_list)
+
+            self.env.constraints = P.constraints
+            conflict_dict = self.env.get_first_conflict(P.solution)
+
+            if not conflict_dict:
+                return P.solution
+
+            print(conflict_dict)
+
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("param", help="input file containing map and obstacles")
@@ -155,15 +246,16 @@ def main():
     agents = param['agents']
 
     env = Environment(dimension, agents, obstacles)
+    cbs = CBS(env)
 
-    # s1 = State(1,1,1)
-    vcon = VertexConstraint(1, Location(1,0))
-    env.constraints.vertex_constraints.append(vcon)
+    solution = cbs.search()
 
-    # for n in env.get_neighbors(s1):
-    #     print(n)
-    
-    env.a_star.search('agent0')
+    print("the solution cost is: " + str(env.compute_solution_cost(solution)))
+
+    for i, plan in solution.items():
+        print("Plan " + str(i))
+        for state in plan:
+            print(state)
 
 if __name__ == "__main__":
     main()
