@@ -11,6 +11,7 @@ import yaml
 from enum import Enum, auto
 from math import fabs
 from itertools import combinations
+from copy import deepcopy
 
 from a_star import AStar
 class Location(object):
@@ -49,7 +50,8 @@ class Conflict(object):
         self.location_2 = Location()
 
     def __str__(self):
-        return '(' + str(self.time) + ', '+ str(self.location_1) + ', ' + str(self.location_2) + ')'
+        return '(' + str(self.time) + ', ' + self.agent_1 + ', ' + self.agent_2 + \
+             ', '+ str(self.location_1) + ', ' + str(self.location_2) + ')' 
 
 class VertexConstraint():
     def __init__(self, time, location):
@@ -60,7 +62,8 @@ class VertexConstraint():
         return self.time == other.time and self.location == other.location
     def __hash__(self):
         return hash(str(self.time)+str(self.location))        
-
+    def __str__(self):
+        return '(' + str(self.time) + ', '+ str(self.location) + ')' 
 class EdgeConstraint(object):
     def __init__(self, time, location_1, location_2):
         self.time = time
@@ -77,9 +80,13 @@ class Constraints(object):
         self.vertex_constraints = set()
         self.edge_constraints = set()
 
-    def __add__(self, other):
+    def add_constraint(self, other):
         self.vertex_constraints |= other.vertex_constraints
         self.edge_constraints |= other.edge_constraints
+        # print(self.vertex_constraints)
+
+    def __str__(self):
+        return str([str(vc) for vc in self.vertex_constraints])
 
 class Environment(object):
     def __init__(self, dimension, agents, obstacles):
@@ -92,6 +99,7 @@ class Environment(object):
         self.make_agent_dict()
 
         self.constraints = Constraints()
+        self.constraint_dict = {}
 
         self.a_star = AStar(self)
 
@@ -134,7 +142,6 @@ class Environment(object):
                     result.location_1 = state_1.location
                     result.agent_1 = agent_1
                     result.agent_2 = agent_2
-
                     return result
         
         return False
@@ -142,12 +149,14 @@ class Environment(object):
     def create_constraints_from_conflict(self, conflict):
         constraint_dict = {}
         if conflict.type == Conflict.VERTEX:
-            constraint = VertexConstraint(conflict.time, conflict.location)
+            v_constraint = VertexConstraint(conflict.time, conflict.location_1)
+            constraint = Constraints()
+            print(v_constraint)
+            constraint.vertex_constraints |= {v_constraint}
             constraint_dict[conflict.agent_1] = constraint
             constraint_dict[conflict.agent_2] = constraint
 
         return constraint_dict
-
 
     def get_state(self, agend_name, solution, t):
         if t < len(solution[agend_name]):
@@ -186,6 +195,7 @@ class Environment(object):
     def compute_solution(self):
         solution = {}
         for agent in self.agent_dict.keys():
+            self.constraints = self.constraint_dict.setdefault(agent, Constraints())
             solution.update({agent:self.a_star.search(agent)})
         return solution
 
@@ -195,7 +205,7 @@ class Environment(object):
 class HighLevelNode(object):
     def __init__(self):
         self.solution = {}
-        self.constraints = Constraints()
+        self.constraint_dict = {}
         self.cost = 0
 
     def __lt__(self, other):
@@ -204,30 +214,58 @@ class HighLevelNode(object):
 class CBS(object):
     def __init__(self, environment):
         self.env = environment 
-        self.open_list = []
-
+        self.open_set = set()
     def search(self):
         start = HighLevelNode()
-        start.constraints = dict.fromkeys(self.env.agent_dict.keys(), Constraints())
+        start.constraint_dict = dict.fromkeys(self.env.agent_dict.keys(), Constraints())
         start.solution = self.env.compute_solution()
-
-        return start.solution
         start.cost = self.env.compute_solution_cost(start.solution)
 
-        self.open_list.append(start)
+        self.open_set |= {start}
 
-        while self.open_list:
-            P = min(self.open_list)
+        while self.open_set:
+            P = min(self.open_set)
+            self.open_set -= {P}
+            print("length of open list is : " + str(len(self.open_set)))
+            # print("opened" + str(P.cost))
 
-            self.env.constraints = P.constraints
+            self.env.constraint_dict = P.constraint_dict
             conflict_dict = self.env.get_first_conflict(P.solution)
 
             if not conflict_dict:
+                print("solution found")
                 return P.solution
 
-            print(conflict_dict)
+            constraint_dict = self.env.create_constraints_from_conflict(conflict_dict)
+            
+            for agent in constraint_dict.keys():
+                new_node = deepcopy(P)
+                print("loop of " + agent)
+                print(new_node.constraint_dict['agent0'])
+                print(new_node.constraint_dict['agent1'])
+                
+                new_node.constraint_dict[agent].add_constraint(constraint_dict[agent]) 
 
+                print(new_node.constraint_dict['agent0'])
+                print(new_node.constraint_dict['agent1'])
+                
+                self.env.constraint_dict = new_node.constraint_dict
+                new_node.solution = self.env.compute_solution()
+                new_node.cost = self.env.compute_solution_cost(new_node.solution)
+                print(str(len(new_node.solution.values())))
 
+                # TODO: ending condition 
+                self.open_set |= {new_node}
+                # for i, j in new_node.constraint_dict.items():
+                #     print( i)
+                    # print(j)
+                    # for point in j:
+                    #     print(point)
+
+                from time import sleep
+                sleep(1.)
+
+        return {}
 
 def main():
     parser = argparse.ArgumentParser()
