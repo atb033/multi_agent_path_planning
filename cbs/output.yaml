@@ -1,0 +1,28 @@
+cost: 8
+schedule:
+  agent0:
+  - t: 0
+    x: 1
+    y: 1
+  - t: 1
+    x: 1
+    y: 1
+  - t: 2
+    x: 1
+    y: 0
+  - t: 3
+    x: 2
+    y: 0
+  agent1:
+  - t: 0
+    x: 0
+    y: 0
+  - t: 1
+    x: 1
+    y: 0
+  - t: 2
+    x: 2
+    y: 0
+  - t: 3
+    x: 3
+    y: 0

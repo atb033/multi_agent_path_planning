@@ -151,7 +151,6 @@ class Environment(object):
         if conflict.type == Conflict.VERTEX:
             v_constraint = VertexConstraint(conflict.time, conflict.location_1)
             constraint = Constraints()
-            print(v_constraint)
             constraint.vertex_constraints |= {v_constraint}
             constraint_dict[conflict.agent_1] = constraint
             constraint_dict[conflict.agent_2] = constraint
@@ -217,7 +216,10 @@ class CBS(object):
         self.open_set = set()
     def search(self):
         start = HighLevelNode()
-        start.constraint_dict = dict.fromkeys(self.env.agent_dict.keys(), Constraints())
+        # TODO: Initialize it in a better way
+        start.constraint_dict = {}
+        for agent in self.env.agent_dict.keys():
+            start.constraint_dict[agent] = Constraints()
         start.solution = self.env.compute_solution()
         start.cost = self.env.compute_solution_cost(start.solution)
 
@@ -226,74 +228,76 @@ class CBS(object):
         while self.open_set:
             P = min(self.open_set)
             self.open_set -= {P}
-            print("length of open list is : " + str(len(self.open_set)))
-            # print("opened" + str(P.cost))
 
             self.env.constraint_dict = P.constraint_dict
             conflict_dict = self.env.get_first_conflict(P.solution)
 
             if not conflict_dict:
                 print("solution found")
-                return P.solution
+
+                return self.generate_plan(P.solution)
 
             constraint_dict = self.env.create_constraints_from_conflict(conflict_dict)
             
             for agent in constraint_dict.keys():
                 new_node = deepcopy(P)
-                print("loop of " + agent)
-                print(new_node.constraint_dict['agent0'])
-                print(new_node.constraint_dict['agent1'])
-                
                 new_node.constraint_dict[agent].add_constraint(constraint_dict[agent]) 
-
-                print(new_node.constraint_dict['agent0'])
-                print(new_node.constraint_dict['agent1'])
                 
                 self.env.constraint_dict = new_node.constraint_dict
                 new_node.solution = self.env.compute_solution()
                 new_node.cost = self.env.compute_solution_cost(new_node.solution)
-                print(str(len(new_node.solution.values())))
 
                 # TODO: ending condition 
                 self.open_set |= {new_node}
-                # for i, j in new_node.constraint_dict.items():
-                #     print( i)
-                    # print(j)
-                    # for point in j:
-                    #     print(point)
-
-                from time import sleep
-                sleep(1.)
 
         return {}
+
+    def generate_plan(self, solution):
+        plan = {}
+        for agent, path in solution.items():
+            path_dict_list = [{'t':state.time, 'x':state.location.x, 'y':state.location.y} for state in path]
+            plan[agent] = path_dict_list
+        return plan
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("param", help="input file containing map and obstacles")
+    parser.add_argument("output", help="output file with the schedule")
     args = parser.parse_args()
     
+    # Read from input file
     with open(args.param, 'r') as param_file:
         try:
             param = yaml.load(param_file, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
             print(exc)
 
-    # print(param)
     dimension = param["map"]["dimensions"]
     obstacles = param["map"]["obstacles"]
     agents = param['agents']
 
     env = Environment(dimension, agents, obstacles)
+
+    # Searching
     cbs = CBS(env)
-
     solution = cbs.search()
+    if not solution:
+        print(" Solution not found" ) 
+        return
 
-    print("the solution cost is: " + str(env.compute_solution_cost(solution)))
+    # Write to output file
+    with open(args.output, 'r') as output_yaml:
+        try:
+            output = yaml.load(output_yaml, Loader=yaml.FullLoader)
+        except yaml.YAMLError as exc:
+            print(exc)
 
-    for i, plan in solution.items():
-        print("Plan " + str(i))
-        for state in plan:
-            print(state)
-
+    output["schedule"] = solution
+    output["cost"] = env.compute_solution_cost(solution)
+    with open(args.output, 'w') as output_yaml:
+        yaml.safe_dump(output, output_yaml)  
+        
+    
 if __name__ == "__main__":
     main()
