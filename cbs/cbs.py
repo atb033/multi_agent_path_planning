@@ -226,7 +226,10 @@ class Environment(object):
         solution = {}
         for agent in self.agent_dict.keys():
             self.constraints = self.constraint_dict.setdefault(agent, Constraints())
-            solution.update({agent:self.a_star.search(agent)})
+            local_solution = self.a_star.search(agent)
+            if not local_solution:
+                return False
+            solution.update({agent:local_solution})
         return solution
 
     def compute_solution_cost(self, solution):
@@ -252,6 +255,8 @@ class CBS(object):
         for agent in self.env.agent_dict.keys():
             start.constraint_dict[agent] = Constraints()
         start.solution = self.env.compute_solution()
+        if not start.solution:
+            return {}
         start.cost = self.env.compute_solution_cost(start.solution)
 
         self.open_set |= {start}
@@ -276,6 +281,8 @@ class CBS(object):
                 
                 self.env.constraint_dict = new_node.constraint_dict
                 new_node.solution = self.env.compute_solution()
+                if not new_node.solution:
+                    continue
                 new_node.cost = self.env.compute_solution_cost(new_node.solution)
 
                 # TODO: ending condition 
