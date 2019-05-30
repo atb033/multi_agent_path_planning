@@ -63,5 +63,5 @@ python3 ../visualize.py input.yaml output.yaml
 
 Test 1 (Success                         | Test 2 (Success)
 :--------------------------------------:|:-------------------------:
-![Success](./cbs/results/test_1.gif)  |![Failure](./cbs/results/test_2.gif)
+![Success](./cbs/results/test_2.gif)  |![Failure](./cbs/results/test_1.gif)
 
