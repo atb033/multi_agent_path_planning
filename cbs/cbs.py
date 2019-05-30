@@ -11,6 +11,7 @@ See the article: 10.1109/ICRA.2011.5980306
 import argparse
 import yaml
 from enum import Enum, auto
+from math import fabs
 
 class Location(object):
     def __init__(self, x, y):
@@ -59,9 +60,12 @@ class Actions(Enum):
     RIGHT = auto()
 
 class Environment(object):
-    def __init__(self, dimension, obstacles):
+    def __init__(self, dimension, agents, obstacles):
         self.dimension = dimension
         self.obstacles = obstacles
+        self.agents = agents
+
+        self.make_agent_goal_dict()
 
         self.constraints = Constraints()
 
@@ -112,21 +116,42 @@ class Environment(object):
     def is_solution(self):
         pass
 
+    def admissible_heuristic(self, state, agent_name):
+        goal = self.agent_goal_dict[agent_name]
+        return fabs(state.location.x - goal[0]) + fabs(state.location.y - goal[1])
+
+    def a_star_search(self, initial_state, goal_state):
+        """
+        low level search 
+        """
+        closed_set = []
+        open_set = [initial_state]
+
+        came_from = {}
+        
+
+    def make_agent_goal_dict(self):
+        self.agent_goal_dict = {}
+        for agent in self.agents:
+            self.agent_goal_dict.update({agent['name']:agent['goal']})
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("map", help="input file containing map and obstacles")
+    parser.add_argument("param", help="input file containing map and obstacles")
     args = parser.parse_args()
     
-    with open(args.map, 'r') as map_file:
+    with open(args.param, 'r') as param_file:
         try:
-            map = yaml.load(map_file, Loader=yaml.FullLoader)
+            param = yaml.load(param_file, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
             print(exc)
 
-    # print(map)
-    dimension = map["map"]["dimensions"]
-    obstacles = map["map"]["obstacles"]
-    env = Environment(dimension, obstacles)
+    # print(param)
+    dimension = param["map"]["dimensions"]
+    obstacles = param["map"]["obstacles"]
+    agents = param['agents']
+
+    env = Environment(dimension, agents, obstacles)
 
     s1 = State(1,1,1)
     vcon = VertexConstraint(2, Location(1,0))
