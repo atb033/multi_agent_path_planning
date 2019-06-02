@@ -1,0 +1,508 @@
+agents:
+-   goal: [21, 4]
+    name: agent0
+    start: [21, 5]
+-   goal: [1, 9]
+    name: agent1
+    start: [31, 1]
+-   goal: [3, 25]
+    name: agent2
+    start: [13, 31]
+-   goal: [28, 26]
+    name: agent3
+    start: [19, 26]
+-   goal: [11, 22]
+    name: agent4
+    start: [10, 2]
+-   goal: [8, 26]
+    name: agent5
+    start: [4, 27]
+-   goal: [6, 8]
+    name: agent6
+    start: [27, 24]
+-   goal: [21, 6]
+    name: agent7
+    start: [19, 6]
+-   goal: [8, 31]
+    name: agent8
+    start: [25, 7]
+-   goal: [29, 22]
+    name: agent9
+    start: [31, 7]
+-   goal: [8, 8]
+    name: agent10
+    start: [16, 20]
+-   goal: [3, 26]
+    name: agent11
+    start: [17, 29]
+-   goal: [14, 20]
+    name: agent12
+    start: [2, 31]
+-   goal: [8, 20]
+    name: agent13
+    start: [21, 4]
+-   goal: [10, 4]
+    name: agent14
+    start: [28, 2]
+-   goal: [12, 21]
+    name: agent15
+    start: [0, 5]
+-   goal: [18, 29]
+    name: agent16
+    start: [3, 23]
+-   goal: [22, 25]
+    name: agent17
+    start: [16, 19]
+-   goal: [0, 14]
+    name: agent18
+    start: [7, 8]
+-   goal: [3, 5]
+    name: agent19
+    start: [15, 19]
+-   goal: [23, 9]
+    name: agent20
+    start: [10, 4]
+-   goal: [27, 15]
+    name: agent21
+    start: [27, 5]
+-   goal: [25, 4]
+    name: agent22
+    start: [19, 23]
+-   goal: [27, 7]
+    name: agent23
+    start: [18, 13]
+-   goal: [2, 0]
+    name: agent24
+    start: [18, 6]
+-   goal: [23, 25]
+    name: agent25
+    start: [19, 22]
+-   goal: [23, 26]
+    name: agent26
+    start: [3, 12]
+-   goal: [0, 12]
+    name: agent27
+    start: [12, 6]
+-   goal: [13, 11]
+    name: agent28
+    start: [25, 5]
+-   goal: [25, 7]
+    name: agent29
+    start: [4, 17]
+-   goal: [28, 31]
+    name: agent30
+    start: [17, 3]
+-   goal: [6, 21]
+    name: agent31
+    start: [26, 7]
+-   goal: [6, 23]
+    name: agent32
+    start: [1, 13]
+-   goal: [27, 25]
+    name: agent33
+    start: [29, 26]
+-   goal: [8, 6]
+    name: agent34
+    start: [28, 14]
+-   goal: [19, 11]
+    name: agent35
+    start: [20, 21]
+-   goal: [6, 31]
+    name: agent36
+    start: [26, 9]
+-   goal: [28, 12]
+    name: agent37
+    start: [19, 15]
+-   goal: [1, 25]
+    name: agent38
+    start: [17, 17]
+-   goal: [26, 9]
+    name: agent39
+    start: [17, 2]
+-   goal: [22, 12]
+    name: agent40
+    start: [12, 28]
+-   goal: [0, 10]
+    name: agent41
+    start: [29, 30]
+-   goal: [22, 10]
+    name: agent42
+    start: [11, 18]
+-   goal: [30, 16]
+    name: agent43
+    start: [14, 7]
+-   goal: [27, 5]
+    name: agent44
+    start: [23, 9]
+-   goal: [9, 1]
+    name: agent45
+    start: [5, 1]
+-   goal: [23, 29]
+    name: agent46
+    start: [23, 20]
+-   goal: [30, 2]
+    name: agent47
+    start: [30, 29]
+-   goal: [29, 29]
+    name: agent48
+    start: [11, 12]
+-   goal: [11, 11]
+    name: agent49
+    start: [7, 6]
+-   goal: [18, 10]
+    name: agent50
+    start: [22, 6]
+-   goal: [31, 1]
+    name: agent51
+    start: [13, 8]
+-   goal: [2, 13]
+    name: agent52
+    start: [8, 24]
+-   goal: [20, 13]
+    name: agent53
+    start: [19, 21]
+-   goal: [16, 4]
+    name: agent54
+    start: [5, 10]
+-   goal: [16, 1]
+    name: agent55
+    start: [19, 2]
+-   goal: [26, 12]
+    name: agent56
+    start: [2, 13]
+-   goal: [2, 19]
+    name: agent57
+    start: [19, 7]
+-   goal: [3, 23]
+    name: agent58
+    start: [8, 9]
+-   goal: [4, 7]
+    name: agent59
+    start: [30, 26]
+-   goal: [28, 13]
+    name: agent60
+    start: [17, 24]
+-   goal: [13, 2]
+    name: agent61
+    start: [1, 5]
+-   goal: [0, 7]
+    name: agent62
+    start: [1, 14]
+-   goal: [16, 11]
+    name: agent63
+    start: [9, 28]
+-   goal: [5, 26]
+    name: agent64
+    start: [13, 11]
+-   goal: [9, 31]
+    name: agent65
+    start: [4, 7]
+-   goal: [0, 11]
+    name: agent66
+    start: [31, 21]
+-   goal: [13, 29]
+    name: agent67
+    start: [20, 5]
+-   goal: [27, 24]
+    name: agent68
+    start: [13, 26]
+-   goal: [23, 20]
+    name: agent69
+    start: [12, 24]
+-   goal: [9, 21]
+    name: agent70
+    start: [12, 8]
+-   goal: [20, 2]
+    name: agent71
+    start: [19, 8]
+-   goal: [30, 6]
+    name: agent72
+    start: [30, 27]
+-   goal: [19, 1]
+    name: agent73
+    start: [29, 8]
+-   goal: [28, 0]
+    name: agent74
+    start: [31, 28]
+-   goal: [16, 29]
+    name: agent75
+    start: [9, 23]
+-   goal: [18, 12]
+    name: agent76
+    start: [0, 3]
+-   goal: [31, 0]
+    name: agent77
+    start: [11, 10]
+-   goal: [20, 8]
+    name: agent78
+    start: [3, 11]
+-   goal: [20, 3]
+    name: agent79
+    start: [10, 21]
+-   goal: [7, 31]
+    name: agent80
+    start: [2, 3]
+-   goal: [9, 27]
+    name: agent81
+    start: [24, 1]
+-   goal: [5, 6]
+    name: agent82
+    start: [5, 13]
+-   goal: [22, 4]
+    name: agent83
+    start: [24, 27]
+-   goal: [13, 20]
+    name: agent84
+    start: [21, 26]
+-   goal: [25, 20]
+    name: agent85
+    start: [17, 19]
+-   goal: [30, 9]
+    name: agent86
+    start: [31, 19]
+-   goal: [27, 27]
+    name: agent87
+    start: [27, 23]
+-   goal: [24, 15]
+    name: agent88
+    start: [9, 4]
+-   goal: [27, 29]
+    name: agent89
+    start: [11, 3]
+-   goal: [12, 20]
+    name: agent90
+    start: [12, 1]
+-   goal: [18, 7]
+    name: agent91
+    start: [28, 25]
+-   goal: [14, 14]
+    name: agent92
+    start: [27, 28]
+-   goal: [21, 25]
+    name: agent93
+    start: [21, 10]
+-   goal: [25, 10]
+    name: agent94
+    start: [31, 25]
+-   goal: [6, 3]
+    name: agent95
+    start: [26, 4]
+-   goal: [15, 15]
+    name: agent96
+    start: [7, 25]
+-   goal: [20, 5]
+    name: agent97
+    start: [1, 17]
+-   goal: [9, 5]
+    name: agent98
+    start: [24, 7]
+-   goal: [5, 21]
+    name: agent99
+    start: [28, 20]
+map:
+    dimensions: [32, 32]
+    obstacles:
+    - !!python/tuple [22, 21]
+    - !!python/tuple [4, 22]
+    - !!python/tuple [0, 17]
+    - !!python/tuple [27, 14]
+    - !!python/tuple [22, 29]
+    - !!python/tuple [30, 17]
+    - !!python/tuple [18, 4]
+    - !!python/tuple [31, 20]
+    - !!python/tuple [12, 7]
+    - !!python/tuple [4, 26]
+    - !!python/tuple [5, 22]
+    - !!python/tuple [18, 11]
+    - !!python/tuple [15, 5]
+    - !!python/tuple [28, 6]
+    - !!python/tuple [26, 17]
+    - !!python/tuple [2, 22]
+    - !!python/tuple [0, 15]
+    - !!python/tuple [22, 22]
+    - !!python/tuple [26, 28]
+    - !!python/tuple [30, 10]
+    - !!python/tuple [18, 25]
+    - !!python/tuple [27, 10]
+    - !!python/tuple [19, 20]
+    - !!python/tuple [10, 10]
+    - !!python/tuple [31, 15]
+    - !!python/tuple [10, 7]
+    - !!python/tuple [0, 23]
+    - !!python/tuple [23, 28]
+    - !!python/tuple [26, 16]
+    - !!python/tuple [7, 2]
+    - !!python/tuple [3, 16]
+    - !!python/tuple [11, 29]
+    - !!python/tuple [8, 10]
+    - !!python/tuple [13, 10]
+    - !!python/tuple [4, 16]
+    - !!python/tuple [1, 1]
+    - !!python/tuple [13, 27]
+    - !!python/tuple [8, 15]
+    - !!python/tuple [28, 18]
+    - !!python/tuple [0, 0]
+    - !!python/tuple [5, 15]
+    - !!python/tuple [26, 29]
+    - !!python/tuple [17, 30]
+    - !!python/tuple [15, 27]
+    - !!python/tuple [19, 18]
+    - !!python/tuple [11, 20]
+    - !!python/tuple [5, 19]
+    - !!python/tuple [1, 24]
+    - !!python/tuple [20, 31]
+    - !!python/tuple [21, 21]
+    - !!python/tuple [24, 8]
+    - !!python/tuple [29, 19]
+    - !!python/tuple [11, 1]
+    - !!python/tuple [17, 14]
+    - !!python/tuple [21, 8]
+    - !!python/tuple [18, 19]
+    - !!python/tuple [7, 4]
+    - !!python/tuple [25, 9]
+    - !!python/tuple [2, 29]
+    - !!python/tuple [25, 14]
+    - !!python/tuple [8, 13]
+    - !!python/tuple [18, 28]
+    - !!python/tuple [25, 3]
+    - !!python/tuple [17, 20]
+    - !!python/tuple [19, 28]
+    - !!python/tuple [23, 30]
+    - !!python/tuple [27, 17]
+    - !!python/tuple [27, 13]
+    - !!python/tuple [13, 19]
+    - !!python/tuple [7, 22]
+    - !!python/tuple [26, 2]
+    - !!python/tuple [20, 16]
+    - !!python/tuple [14, 12]
+    - !!python/tuple [1, 28]
+    - !!python/tuple [28, 27]
+    - !!python/tuple [19, 19]
+    - !!python/tuple [5, 9]
+    - !!python/tuple [29, 12]
+    - !!python/tuple [15, 2]
+    - !!python/tuple [3, 9]
+    - !!python/tuple [29, 13]
+    - !!python/tuple [30, 30]
+    - !!python/tuple [26, 25]
+    - !!python/tuple [9, 30]
+    - !!python/tuple [18, 15]
+    - !!python/tuple [21, 2]
+    - !!python/tuple [15, 13]
+    - !!python/tuple [1, 0]
+    - !!python/tuple [15, 26]
+    - !!python/tuple [14, 17]
+    - !!python/tuple [1, 4]
+    - !!python/tuple [6, 5]
+    - !!python/tuple [22, 3]
+    - !!python/tuple [7, 16]
+    - !!python/tuple [6, 30]
+    - !!python/tuple [30, 5]
+    - !!python/tuple [24, 12]
+    - !!python/tuple [16, 12]
+    - !!python/tuple [19, 31]
+    - !!python/tuple [9, 11]
+    - !!python/tuple [5, 28]
+    - !!python/tuple [19, 16]
+    - !!python/tuple [7, 11]
+    - !!python/tuple [8, 2]
+    - !!python/tuple [2, 16]
+    - !!python/tuple [28, 23]
+    - !!python/tuple [3, 7]
+    - !!python/tuple [25, 28]
+    - !!python/tuple [31, 6]
+    - !!python/tuple [22, 1]
+    - !!python/tuple [13, 14]
+    - !!python/tuple [8, 0]
+    - !!python/tuple [13, 3]
+    - !!python/tuple [0, 27]
+    - !!python/tuple [8, 5]
+    - !!python/tuple [9, 14]
+    - !!python/tuple [29, 23]
+    - !!python/tuple [8, 22]
+    - !!python/tuple [14, 9]
+    - !!python/tuple [31, 30]
+    - !!python/tuple [7, 12]
+    - !!python/tuple [19, 30]
+    - !!python/tuple [16, 26]
+    - !!python/tuple [2, 10]
+    - !!python/tuple [1, 23]
+    - !!python/tuple [6, 13]
+    - !!python/tuple [10, 3]
+    - !!python/tuple [9, 24]
+    - !!python/tuple [13, 21]
+    - !!python/tuple [2, 6]
+    - !!python/tuple [27, 8]
+    - !!python/tuple [15, 30]
+    - !!python/tuple [28, 24]
+    - !!python/tuple [21, 16]
+    - !!python/tuple [31, 17]
+    - !!python/tuple [26, 1]
+    - !!python/tuple [8, 25]
+    - !!python/tuple [20, 26]
+    - !!python/tuple [5, 24]
+    - !!python/tuple [7, 19]
+    - !!python/tuple [29, 3]
+    - !!python/tuple [7, 20]
+    - !!python/tuple [15, 10]
+    - !!python/tuple [8, 4]
+    - !!python/tuple [29, 31]
+    - !!python/tuple [14, 23]
+    - !!python/tuple [31, 13]
+    - !!python/tuple [4, 14]
+    - !!python/tuple [4, 9]
+    - !!python/tuple [13, 15]
+    - !!python/tuple [23, 19]
+    - !!python/tuple [4, 24]
+    - !!python/tuple [20, 15]
+    - !!python/tuple [15, 17]
+    - !!python/tuple [9, 19]
+    - !!python/tuple [9, 18]
+    - !!python/tuple [16, 27]
+    - !!python/tuple [7, 28]
+    - !!python/tuple [1, 31]
+    - !!python/tuple [18, 24]
+    - !!python/tuple [14, 1]
+    - !!python/tuple [31, 11]
+    - !!python/tuple [31, 12]
+    - !!python/tuple [17, 26]
+    - !!python/tuple [15, 7]
+    - !!python/tuple [14, 13]
+    - !!python/tuple [10, 6]
+    - !!python/tuple [8, 7]
+    - !!python/tuple [9, 2]
+    - !!python/tuple [26, 18]
+    - !!python/tuple [23, 12]
+    - !!python/tuple [17, 5]
+    - !!python/tuple [23, 17]
+    - !!python/tuple [5, 18]
+    - !!python/tuple [12, 3]
+    - !!python/tuple [4, 15]
+    - !!python/tuple [8, 19]
+    - !!python/tuple [20, 27]
+    - !!python/tuple [11, 21]
+    - !!python/tuple [30, 31]
+    - !!python/tuple [16, 25]
+    - !!python/tuple [0, 1]
+    - !!python/tuple [27, 31]
+    - !!python/tuple [15, 31]
+    - !!python/tuple [15, 3]
+    - !!python/tuple [26, 6]
+    - !!python/tuple [26, 3]
+    - !!python/tuple [14, 10]
+    - !!python/tuple [18, 2]
+    - !!python/tuple [18, 0]
+    - !!python/tuple [10, 24]
+    - !!python/tuple [18, 27]
+    - !!python/tuple [11, 23]
+    - !!python/tuple [15, 24]
+    - !!python/tuple [30, 3]
+    - !!python/tuple [0, 30]
+    - !!python/tuple [6, 20]
+    - !!python/tuple [24, 20]
+    - !!python/tuple [27, 18]
+    - !!python/tuple [23, 24]
+    - !!python/tuple [27, 21]
+    - !!python/tuple [11, 6]
+    - !!python/tuple [25, 19]
+    - !!python/tuple [11, 25]

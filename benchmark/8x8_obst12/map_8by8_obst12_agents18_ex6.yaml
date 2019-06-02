@@ -1,0 +1,70 @@
+agents:
+-   goal: [4, 5]
+    name: agent0
+    start: [3, 1]
+-   goal: [1, 2]
+    name: agent1
+    start: [2, 2]
+-   goal: [5, 4]
+    name: agent2
+    start: [4, 1]
+-   goal: [5, 0]
+    name: agent3
+    start: [5, 6]
+-   goal: [7, 4]
+    name: agent4
+    start: [4, 7]
+-   goal: [1, 4]
+    name: agent5
+    start: [7, 5]
+-   goal: [6, 4]
+    name: agent6
+    start: [3, 2]
+-   goal: [3, 2]
+    name: agent7
+    start: [6, 6]
+-   goal: [6, 3]
+    name: agent8
+    start: [5, 4]
+-   goal: [3, 5]
+    name: agent9
+    start: [2, 7]
+-   goal: [6, 2]
+    name: agent10
+    start: [5, 0]
+-   goal: [2, 1]
+    name: agent11
+    start: [1, 1]
+-   goal: [3, 1]
+    name: agent12
+    start: [6, 7]
+-   goal: [7, 6]
+    name: agent13
+    start: [0, 2]
+-   goal: [1, 1]
+    name: agent14
+    start: [2, 4]
+-   goal: [7, 0]
+    name: agent15
+    start: [7, 7]
+-   goal: [4, 1]
+    name: agent16
+    start: [1, 4]
+-   goal: [3, 6]
+    name: agent17
+    start: [0, 4]
+map:
+    dimensions: [8, 8]
+    obstacles:
+    - !!python/tuple [1, 6]
+    - !!python/tuple [2, 5]
+    - !!python/tuple [0, 3]
+    - !!python/tuple [1, 7]
+    - !!python/tuple [2, 6]
+    - !!python/tuple [7, 2]
+    - !!python/tuple [3, 3]
+    - !!python/tuple [4, 6]
+    - !!python/tuple [7, 1]
+    - !!python/tuple [7, 3]
+    - !!python/tuple [0, 5]
+    - !!python/tuple [0, 1]

@@ -61,7 +61,10 @@ To visualize the generated results:
 python3 ../visualize.py input.yaml output.yaml
 ```
 
-Test 1 (Success                         | Test 2 (Success)
+Test 1 (Success)                        | Test 2 (Success)
 :--------------------------------------:|:-------------------------:
 ![Success](./cbs/results/test_2.gif)  |![Failure](./cbs/results/test_1.gif)
 
+8x8 grid                                | 32x32 grid
+:--------------------------------------:|:-------------------------:
+![Test 3](./cbs/results/test_3.gif)     |![Test 4](./cbs/results/test_4.gif)
