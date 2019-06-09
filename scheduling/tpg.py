@@ -18,7 +18,7 @@ class Vertex:
         self.location = location
         self.time = time
     def __str__(self):
-        return str(self.agent + ': ' + str(self.location))
+        return str(self.agent + ' t: ' + str(self.time) + ': ' + str(self.location))
     def __eq__(self, other):
         return self.agent == other.agent and self.location == other.location and self.time == other.time
     def __hash__(self):
@@ -37,12 +37,21 @@ class Edge:
 
 class TemporalPlanGraph:
     def __init__(self, schedule):
+
         self.delta = 0.2 # safety distance
+
         self.schedule = schedule
+
         self.vertices = set()
         self.edges_type_1 = []
         self.edges_type_2 = []
+
         self.generate_tpg()
+        self.augment_graph()
+
+        self.initial_states = []
+        self.final_states = []
+        self.generate_initial_final_states()
 
     def generate_tpg(self):
         # Creating type-1 edges
@@ -74,7 +83,7 @@ class TemporalPlanGraph:
                                 if v_tk in self.vertices and s_tk==s_tj:
                                     edge = Edge(v_tj, v_tk)
                                     self.edges_type_2.append(edge)
-                                    print(edge)
+                                    # print(edge)
 
 
     def augment_graph(self):
@@ -100,7 +109,7 @@ class TemporalPlanGraph:
             if not (v1 and v2):
                 continue
             edge4 = Edge(v1, v2)
-            # print(edge4)
+            edge4.edge_length = 0
             self.augmented_edges.add(edge4)
 
         # print(self.augmented_edges)
@@ -139,6 +148,13 @@ class TemporalPlanGraph:
                     return new_vertex
         return False
 
+    def generate_initial_final_states(self):
+        for agent, plan in self.schedule.items():
+            init_state = Vertex(agent, Location(plan[0]['x'], plan[0]['y']), plan[0]['t'])
+            final_state = Vertex(agent, Location(plan[-1]['x'], plan[-1]['y']), plan[-1]['t'])
+
+            self.initial_states.append(init_state)
+            self.final_states.append(final_state)
 
 
 def main():
