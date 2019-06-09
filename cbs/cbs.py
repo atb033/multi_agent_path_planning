@@ -13,7 +13,7 @@ from math import fabs
 from itertools import combinations
 from copy import deepcopy
 
-from a_star import AStar
+from cbs.a_star import AStar
 class Location(object):
     def __init__(self, x=-1, y=-1):
         self.x = x
