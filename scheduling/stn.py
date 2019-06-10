@@ -1,6 +1,6 @@
 """
 
-Simple temporal network class
+Simple temporal network 
 
 author: Ashwin Bose (@atb033)
 

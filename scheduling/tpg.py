@@ -17,8 +17,9 @@ class Vertex:
         self.agent = agent
         self.location = location
         self.time = time
+        self.cost = 0
     def __str__(self):
-        return str(self.agent + ' t: ' + str(self.time) + ': ' + str(self.location))
+        return str(self.agent + ' t: ' + str(self.time) + ': ' + str(self.location)  + 'cost: ' + str(self.cost))
     def __eq__(self, other):
         return self.agent == other.agent and self.location == other.location and self.time == other.time
     def __hash__(self):
