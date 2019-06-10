@@ -24,9 +24,8 @@ class OptimizationClass:
         c = self.get_cost_matrix()
 
         res = linprog(c, A_ub=A_in, b_ub=b_in, A_eq=A_equ, b_eq=b_equ)
-        # res = linprog(c, A_ub=A_in, b_ub=b_in)
 
-        print(res)
+        return res
 
     # def generate_
     def get_cost_function(self, variables):
@@ -46,7 +45,6 @@ class OptimizationClass:
     def get_variables(self):
         variables = []
         for v in self.vertices:
-            print(v)
             variables.append(v.cost)
         return variables
 
@@ -61,24 +59,20 @@ class OptimizationClass:
                     index_a = i
                 if v == edge.vertex_b:
                     index_b = i
+
             # lower bound
             row = [0.]*len(self.vertices)
             row[index_a] = 1
             row[index_b] = -1
             lb = edge.bound[0]
             A.append(row)
-            b.append(-lb)
-
-            print(str(row) + ',  ' + str(-lb))
-            
+            b.append(-lb)            
             # upper bound
             row = [0.]*len(self.vertices)
             row[index_b] = 1
             row[index_a] = -1
             ub = edge.bound[1]
             if ub == float('inf') : continue
-            
-            print(str(row) + ',  ' + str(ub))
 
             A.append(row)
             b.append(ub)
@@ -96,9 +90,6 @@ class OptimizationClass:
         return (A, b)
 
                 
-            
-    
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("output", help="output file with the schedule")
@@ -115,9 +106,10 @@ def main():
 
     stn = SimpleTemporalNetwork(tpg)
 
-    optimize = OptimizationClass(stn)
+    opt = OptimizationClass(stn)
 
-    optimize.optimize()
+    schedule = opt.optimize()
+    print(schedule.x)
 
 
 if __name__ == "__main__":

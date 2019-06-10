@@ -32,7 +32,7 @@ class SimpleTemporalNetwork:
         self.tpg = tpg
         self.edges = []
 
-        self.vmax = 1 # maximum velocity of agents
+        self.vmax = [0.5, 1.] # maximum velocity of agents, can change for each agent
 
         self.vertices = tpg.augmented_vertices
 
@@ -41,7 +41,11 @@ class SimpleTemporalNetwork:
 
     def generate_bounds(self):
         for edge in self.tpg.augmented_edges:
-            lb = edge.edge_length/self.vmax
+            if edge.vertex_a.agent == edge.vertex_a.agent:
+                if edge.vertex_a.agent == 'agent0':
+                    lb = edge.edge_length/self.vmax[0]
+                else:
+                    lb = edge.edge_length/self.vmax[1]
             ub = float('inf')
             stn_edge = Edge(edge.vertex_a, edge.vertex_b, [lb, ub])
             self.edges.append(stn_edge)
