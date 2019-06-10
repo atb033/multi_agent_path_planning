@@ -19,7 +19,7 @@ class Vertex:
         self.time = time
         self.cost = 0
     def __str__(self):
-        return str(self.agent + ' t: ' + str(self.time) + ': ' + str(self.location)  + 'cost: ' + str(self.cost))
+        return str(self.agent + ' t: ' + str(self.time) + ': ' + str(self.location)  )
     def __eq__(self, other):
         return self.agent == other.agent and self.location == other.location and self.time == other.time
     def __hash__(self):
@@ -43,7 +43,7 @@ class TemporalPlanGraph:
 
         self.schedule = schedule
 
-        self.vertices = set()
+        self.vertices = []
         self.edges_type_1 = []
         self.edges_type_2 = []
 
@@ -58,14 +58,14 @@ class TemporalPlanGraph:
         # Creating type-1 edges
         for agent, plan in self.schedule.items():
             vertex = Vertex(agent, Location(plan[0]['x'], plan[0]['y']), plan[0]['t'])
-            self.vertices.add(vertex)
+            self.vertices.append(vertex)
             for i in range(len(plan)-1):
                 location_a = Location(plan[i]['x'], plan[i]['y'])
                 location_b = Location(plan[i+1]['x'], plan[i+1]['y'])
                 if not location_a == location_b:
                     vertex_a = Vertex(agent, location_a, plan[i]['t'])
                     vertex_b = Vertex(agent, location_b, plan[i+1]['t'])
-                    self.vertices.add(vertex_b)
+                    self.vertices.append(vertex_b)
                     
                     edge_ab = Edge(vertex_a, vertex_b)
                     self.edges_type_1.append(edge_ab)
@@ -88,20 +88,20 @@ class TemporalPlanGraph:
 
 
     def augment_graph(self):
-        self.augmented_edges = set()
+        self.augmented_edges = []
         self.augmented_vertices = self.vertices
         
         for edge in self.edges_type_1:
             v1 = self.return_safety_vertex(edge.vertex_a, 1)
             v2 = self.return_safety_vertex(edge.vertex_b, -1)
 
-            self.augmented_vertices.update({v1, v2})
+            self.augmented_vertices += [v1, v2]
 
             edge1 = Edge(edge.vertex_a, v1)
             edge2 = Edge(v1, v2)
             edge3 = Edge(v2, edge.vertex_b)
 
-            self.augmented_edges.update({edge1,edge2,edge3})
+            self.augmented_edges += [edge1,edge2,edge3]
 
         for edge_t2 in self.edges_type_2:
             v1 = self.return_safety_vertex(edge_t2.vertex_a, 1)
@@ -111,8 +111,8 @@ class TemporalPlanGraph:
                 continue
             edge4 = Edge(v1, v2)
             edge4.edge_length = 0
-            self.augmented_edges.add(edge4)
-
+            self.augmented_edges.append(edge4)
+            # print(edge4)
         # print(self.augmented_edges)
 
 
@@ -132,7 +132,7 @@ class TemporalPlanGraph:
                     new_loc_y = vertex.location.y - self.delta * dir[1]
                     new_loc = Location(new_loc_x, new_loc_y)
 
-                    new_vertex = Vertex(vertex.agent, new_loc, vertex.time)
+                    new_vertex = Vertex(vertex.agent, new_loc, vertex.time-0.1)
                     return new_vertex
             if side == 1:
                 if vertex == edge.vertex_a:
@@ -145,7 +145,7 @@ class TemporalPlanGraph:
                     new_loc_y = vertex.location.y + self.delta * dir[1]
                     new_loc = Location(new_loc_x, new_loc_y)
 
-                    new_vertex = Vertex(vertex.agent, new_loc, vertex.time)
+                    new_vertex = Vertex(vertex.agent, new_loc, vertex.time+0.1)
                     return new_vertex
         return False
 

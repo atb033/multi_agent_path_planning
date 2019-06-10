@@ -30,7 +30,7 @@ class Edge:
 class SimpleTemporalNetwork:
     def __init__(self, tpg):
         self.tpg = tpg
-        self.edges = set()
+        self.edges = []
 
         self.vmax = 1 # maximum velocity of agents
 
@@ -44,22 +44,23 @@ class SimpleTemporalNetwork:
             lb = edge.edge_length/self.vmax
             ub = float('inf')
             stn_edge = Edge(edge.vertex_a, edge.vertex_b, [lb, ub])
-            self.edges.add(stn_edge)
+            self.edges.append(stn_edge)
 
     def generate_end_edges(self):
         start = Vertex('start', Location(-1, -1), -1)
         end  = Vertex('end', Location(-2, -2), -2)
 
-        self.vertices.update({start, end})
-        bound = [0,0]
+        self.vertices += [start, end]
+        bound_start = [0.,0.]
+        bound_end = [0.,float('inf')]
 
         for state in self.tpg.initial_states:
-            edge = Edge(start, state, bound)
-            self.edges.add(edge)
+            edge = Edge(start, state, bound_start)
+            self.edges.append(edge)
         
         for state in self.tpg.final_states:
-            edge = Edge(state, end, bound)
-            self.edges.add(edge)
+            edge = Edge(state, end, bound_end)
+            self.edges.append(edge)
 
 
 def main():
