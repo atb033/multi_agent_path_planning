@@ -15,6 +15,7 @@ from itertools import combinations
 from copy import deepcopy
 
 from cbs.a_star import AStar
+
 class Location(object):
     def __init__(self, x=-1, y=-1):
         self.x = x
@@ -25,9 +26,9 @@ class Location(object):
         return str((self.x, self.y))
 
 class State(object):
-    def __init__(self, time, x, y):
+    def __init__(self, time, location):
         self.time = time
-        self.location = Location(x, y)
+        self.location = location
     def __eq__(self, other):
         return self.time == other.time and self.location == other.location
     def __hash__(self):
@@ -54,7 +55,7 @@ class Conflict(object):
         return '(' + str(self.time) + ', ' + self.agent_1 + ', ' + self.agent_2 + \
              ', '+ str(self.location_1) + ', ' + str(self.location_2) + ')' 
 
-class VertexConstraint():
+class VertexConstraint(object):
     def __init__(self, time, location):
         self.time = time
         self.location = location
@@ -111,23 +112,23 @@ class Environment(object):
         neighbors = []
         
         # Wait action
-        n = State(state.time + 1, state.location.x, state.location.y)
+        n = State(state.time + 1, state.location)
         if self.state_valid(n):
             neighbors.append(n)
         # Up action
-        n = State(state.time + 1, state.location.x, state.location.y+1)
+        n = State(state.time + 1, Location(state.location.x, state.location.y+1))
         if self.state_valid(n) and self.transition_valid(state, n):
             neighbors.append(n)
         # Down action
-        n = State(state.time + 1, state.location.x, state.location.y-1)
+        n = State(state.time + 1, Location(state.location.x, state.location.y-1))
         if self.state_valid(n) and self.transition_valid(state, n):
             neighbors.append(n)
         # Left action
-        n = State(state.time + 1, state.location.x-1, state.location.y)
+        n = State(state.time + 1, Location(state.location.x-1, state.location.y))
         if self.state_valid(n) and self.transition_valid(state, n):
             neighbors.append(n)
         # Right action
-        n = State(state.time + 1, state.location.x+1, state.location.y)
+        n = State(state.time + 1, Location(state.location.x+1, state.location.y))
         if self.state_valid(n) and self.transition_valid(state, n):
             neighbors.append(n)
         return neighbors
@@ -218,8 +219,8 @@ class Environment(object):
 
     def make_agent_dict(self):
         for agent in self.agents:
-            start_state = State(0, agent['start'][0], agent['start'][1])
-            goal_state = State(0, agent['goal'][0], agent['goal'][1])
+            start_state = State(0, Location(agent['start'][0], agent['start'][1]))
+            goal_state = State(0, Location(agent['goal'][0], agent['goal'][1]))
             
             self.agent_dict.update({agent['name']:{'start':start_state, 'goal':goal_state}})
 
