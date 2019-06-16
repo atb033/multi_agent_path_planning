@@ -76,6 +76,6 @@ Once the plan is generated using CBS, please run the following to generate the p
 
 ```
 cd ./scheduling
-python minimize.py ../cbs/output.yaml 
+python minimize.py ../cbs/output.yaml real_schedule.yaml
 ```
 

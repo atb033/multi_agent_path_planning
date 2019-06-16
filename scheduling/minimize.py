@@ -15,7 +15,8 @@ class OptimizationClass:
         self.edges = list(self.stn.edges)
 
         self.vertices = list(self.stn.vertices)
-        self.variables = self.get_variables()
+        self.vertices = sorted(self.vertices, key = lambda i:(i.agent, i.time))
+        self.agent_names = list(set([i.agent for i in self.vertices])-{'start', 'end'})
 
     def optimize(self):
         
@@ -41,12 +42,6 @@ class OptimizationClass:
             if v.agent == 'end':
                 A[i] = 1
         return A
-
-    def get_variables(self):
-        variables = []
-        for v in self.vertices:
-            variables.append(v.cost)
-        return variables
 
     def get_inequality_constraints(self):
         A = []
@@ -89,28 +84,43 @@ class OptimizationClass:
                 A.append(row)
         return (A, b)
 
-                
+    def generate_schedule(self):
+        schedule_list = self.optimize()
+        schedule = {agent_name: [] for agent_name in self.agent_names}
+
+        # output_list
+        for i in  range(len(self.vertices)):
+            for agent_name in self.agent_names:
+                if self.vertices[i].agent == agent_name:
+                    point = {}
+                    point['x'] = self.vertices[i].location.x
+                    point['y'] = self.vertices[i].location.y
+                    point['t'] = float("{0:.3f}".format(schedule_list.x[i]))
+
+                    schedule[agent_name].append(point)           
+
+        return schedule
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("output", help="output file with the schedule")
+    parser.add_argument("plan", help="plan file with the schedule")
+    parser.add_argument("real_schedule", help="plan file with the schedule")
     args = parser.parse_args()
 
     # Read from input file
-    with open(args.output, 'r') as output_file:
+    with open(args.plan, 'r') as plan_file:
         try:
-            output = yaml.load(output_file, Loader=yaml.FullLoader)
+            plan = yaml.load(plan_file, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
             print(exc)
 
-    tpg = TemporalPlanGraph(output['schedule'])
-
+    tpg = TemporalPlanGraph(plan['schedule'])
     stn = SimpleTemporalNetwork(tpg)
-
     opt = OptimizationClass(stn)
+    schedule = opt.generate_schedule()
 
-    schedule = opt.optimize()
-    print(schedule.x)
-
+    with open(args.real_schedule, 'w') as real_schedule_yaml:
+        yaml.dump(schedule, real_schedule_yaml, default_flow_style=False)
 
 if __name__ == "__main__":
     main()
