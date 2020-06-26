@@ -9,7 +9,6 @@ import sys
 sys.path.insert(0, '../')
 import argparse
 import yaml
-from enum import Enum, auto
 from math import fabs
 from itertools import combinations
 from copy import deepcopy
