@@ -26,7 +26,7 @@ SIPP is a local planner, using which, a collision-free plan can be generated, af
 For SIPP multi-agent prioritized planning, run:
 
 ``` 
-cd ./sipp
+cd ./centralized/sipp
 python3 multi_sipp.py input.yaml output.yaml
 ```
 
@@ -46,7 +46,7 @@ python3 visualize_sipp.py input.yaml output.yaml --video 'sipp.avi' --speed 1
 
 |            Test 1 (Success)            |            Test 2 (Failure)            |
 |:--------------------------------------:|:--------------------------------------:|
-| ![Success](./sipp/results/success.gif) | ![Failure](./sipp/results/failure.gif)|
+| ![Success](./centralized/sipp/results/success.gif) | ![Failure](./centralized/sipp/results/failure.gif)|
 
 #### Conflict Based Search
 
@@ -57,7 +57,7 @@ Conclict-Based Search (CBS), is a multi-agent global path planner.
 Run:
 
 ``` 
-cd ./cbs
+cd ./centralized/cbs
 python3 cbs.py input.yaml output.yaml
 ```
 
@@ -71,11 +71,11 @@ python3 ../visualize.py input.yaml output.yaml
 
 |           Test 1 (Success)           |           Test 2 (Success)           |
 |:------------------------------------:|:------------------------------------:|
-|![Success](./cbs/results/test_2.gif) | ![Failure](./cbs/results/test_1.gif)|
+|![Success](./centralized/cbs/results/test_2.gif) | ![Failure](./centralized/cbs/results/test_1.gif)|
 
 |               8x8 grid              |              32x32 grid             |
 |:-----------------------------------:|:-----------------------------------:|
-| ![Test 3](./cbs/results/test_3.gif) | ![Test 4](./cbs/results/test_4.gif)|
+| ![Test 3](./centralized/cbs/results/test_3.gif) | ![Test 4](./centralized/cbs/results/test_4.gif)|
 
 ## Post-Processing
 
@@ -88,6 +88,6 @@ This work is based on: [Multi-Agent Path Finding with Kinematic Constraints](htt
 Once the plan is generated using CBS, please run the following to generate the plan-execution schedule:
 
 ``` shell
-cd ./scheduling
-python minimize.py ../cbs/output.yaml real_schedule.yaml
+cd ./centralized/scheduling
+python3 minimize.py ../cbs/output.yaml real_schedule.yaml
 ```
