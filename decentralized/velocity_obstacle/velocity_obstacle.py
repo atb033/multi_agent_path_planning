@@ -6,12 +6,10 @@ author: Ashwin Bose (atb033@github.com)
 
 from multi_robot_plot import plot_robot_and_obstacles
 import numpy as np
-import cvxpy as cp
-import matplotlib.pyplot as plt
 import argparse
 
 SIM_TIME = 5.
-TIMESTEP = 0.025
+TIMESTEP = 0.1
 NUMBER_OF_TIMESTEPS = int(SIM_TIME/TIMESTEP)
 ROBOT_RADIUS = 0.5
 VMAX = 2
@@ -26,18 +24,15 @@ def simulate(filename):
 
     robot_state = start
     robot_state_history = np.empty((16, NUMBER_OF_TIMESTEPS))
-    v_dis = []
     for i in range(NUMBER_OF_TIMESTEPS):
         v_desired = compute_desired_velocity(robot_state, goal)
-        control_vel, v_display = compute_velocity(
+        control_vel = compute_velocity(
             robot_state, obstacles[:, i, :], v_desired)
         robot_state = update_state(robot_state, control_vel)
         robot_state_history[:4, i] = robot_state
-        v_dis.append(v_display)
 
     plot_robot_and_obstacles(
-        robot_state_history, obstacles, ROBOT_RADIUS, NUMBER_OF_TIMESTEPS,
-        v_dis, filename)
+        robot_state_history, obstacles, ROBOT_RADIUS, NUMBER_OF_TIMESTEPS, SIM_TIME, filename)
 
 
 def compute_velocity(robot, obstacles, v_desired):
@@ -91,14 +86,7 @@ def compute_velocity(robot, obstacles, v_desired):
     min_index = np.where(norm == np.amin(norm))[0][0]
     cmd_vel = (v_satisfying_constraints[:, min_index])
 
-    # plt.cla()
-    # plt.scatter(v_satisfying_constraints[0, :], v_satisfying_constraints[1, :])
-    # plt.pause(0.1)
-
-    v_display = v_satisfying_constraints + pA.reshape(2, 1) @ np.ones(np.shape(
-        v_satisfying_constraints)[1]).reshape(1, np.shape(v_satisfying_constraints)[1])
-
-    return cmd_vel, v_display
+    return cmd_vel
 
 
 def check_constraints(v_sample, Amat, bvec):

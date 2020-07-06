@@ -1,7 +1,7 @@
 """
 Plotting tool for 2D multi-robot system
 
-author: Ashwin Bose (atb033@github.com)
+author: Ashwin Bose (@atb033)
 """
 
 import matplotlib.pyplot as plt
@@ -9,36 +9,8 @@ import matplotlib.animation as animation
 from matplotlib.patches import Circle
 import numpy as np
 
-T = 5
-STEP = 0.05
-NUMBER_OF_TIMESTEPS = T/STEP
 
-
-def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, vdis, filename):
-    for i in range(int(num_steps)):
-        plt.cla()
-        plt.gcf().canvas.mpl_connect(
-            'key_release_event',
-            lambda event: [exit(0) if event.key == 'escape' else None])
-
-        # Plot robot
-        plot_robot(robot, i, robot_radius)
-
-        # Plot obstacles
-        for j in range(np.shape(obstacles)[2]):
-            plot_robot(obstacles[:, :, j], i, robot_radius, is_obstacle=True)
-
-        # Plot possible velocities
-        # plt.scatter(vdis[i][0, :], vdis[i][1, :])
-
-        plt.grid(True)
-        plt.ylim(0., 10.)
-        plt.xlim(0., 10.)
-        plt.pause(STEP)
-
-    plt.cla()
-    plt.close()
-
+def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, sim_time, filename):
     # Save animation gif
     if not filename:
         return
@@ -53,7 +25,7 @@ def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, vdis, fi
     obstacle_list = []
     for obstacle in range(np.shape(obstacles)[2]):
         obstacle = Circle((0, 0), robot_radius,
-                          facecolor='blue', edgecolor='black')
+                          facecolor='aqua', edgecolor='black')
         obstacle_list.append(obstacle)
 
     def init():
@@ -69,6 +41,12 @@ def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, vdis, fi
             obstacle_list[j].center = (obstacles[0, i, j], obstacles[1, i, j])
         line.set_data(robot[0, :i], robot[1, :i])
         return [robot_patch] + [line] + obstacle_list
+
+    init()
+    step = (sim_time / num_steps)
+    for i in range(num_steps):
+        animate(i)
+        plt.pause(step)
 
     ani = animation.FuncAnimation(
         fig, animate, np.arange(1, num_steps), interval=200,
