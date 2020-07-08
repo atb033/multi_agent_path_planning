@@ -4,9 +4,10 @@ Collision avoidance using Velocity-obstacle method
 author: Ashwin Bose (atb033@github.com)
 """
 
-from multi_robot_plot import plot_robot_and_obstacles
+from utils.multi_robot_plot import plot_robot_and_obstacles
+from utils.create_obstacles import create_obstacles
+from utils.control import compute_desired_velocity
 import numpy as np
-import argparse
 
 SIM_TIME = 5.
 TIMESTEP = 0.1
@@ -17,15 +18,15 @@ VMIN = 0.2
 
 
 def simulate(filename):
-    obstacles = create_obstacles()
+    obstacles = create_obstacles(SIM_TIME, NUMBER_OF_TIMESTEPS)
 
     start = np.array([5, 0, 0, 0])
     goal = np.array([5, 10, 0, 0])
 
     robot_state = start
-    robot_state_history = np.empty((16, NUMBER_OF_TIMESTEPS))
+    robot_state_history = np.empty((4, NUMBER_OF_TIMESTEPS))
     for i in range(NUMBER_OF_TIMESTEPS):
-        v_desired = compute_desired_velocity(robot_state, goal)
+        v_desired = compute_desired_velocity(robot_state, goal, ROBOT_RADIUS, VMAX)
         control_vel = compute_velocity(
             robot_state, obstacles[:, i, :], v_desired)
         robot_state = update_state(robot_state, control_vel)
@@ -128,67 +129,8 @@ def translate_line(line, translation):
     return matrix @ line
 
 
-def create_obstacles():
-    # Obstacle 1
-    v = -2
-    p0 = np.array([5, 12])
-    obst = create_robot(p0, v, np.pi/2).reshape(4, NUMBER_OF_TIMESTEPS, 1)
-    obstacles = obst
-    # Obstacle 2
-    v = 2
-    p0 = np.array([0, 5])
-    obst = create_robot(p0, v, 0).reshape(4, NUMBER_OF_TIMESTEPS, 1)
-    obstacles = np.dstack((obstacles, obst))
-    # Obstacle 3
-    v = 2
-    p0 = np.array([10, 10])
-    obst = create_robot(p0, v, -np.pi * 3 / 4).reshape(4,
-                                                       NUMBER_OF_TIMESTEPS, 1)
-    obstacles = np.dstack((obstacles, obst))
-    # Obstacle 4
-    v = 2
-    p0 = np.array([7.5, 2.5])
-    obst = create_robot(p0, v, np.pi * 3 / 4).reshape(4,
-                                                      NUMBER_OF_TIMESTEPS, 1)
-    obstacles = np.dstack((obstacles, obst))
-
-    return obstacles
-
-
-def create_robot(p0, v, theta):
-    # Creates obstacles starting at p0 and moving at v in theta direction
-    t = np.linspace(0, SIM_TIME, NUMBER_OF_TIMESTEPS)
-    theta = theta * np.ones(np.shape(t))
-    vx = v * np.cos(theta)
-    vy = v * np.sin(theta)
-    v = np.stack([vx, vy])
-    p0 = p0.reshape((2, 1))
-    p = p0 + np.cumsum(v, axis=1) * TIMESTEP
-    p = np.concatenate((p, v))
-    return p
-
-
 def update_state(x, v):
     new_state = np.empty((4))
     new_state[:2] = x[:2] + v * TIMESTEP
     new_state[-2:] = v
     return new_state
-
-
-def compute_desired_velocity(current_pos, goal_pos):
-    disp_vec = (goal_pos - current_pos)[:2]
-    norm = np.linalg.norm(disp_vec)
-    if norm < ROBOT_RADIUS / 5:
-        return np.zeros(2)
-    disp_vec = disp_vec / norm
-    np.shape(disp_vec)
-    desired_vel = VMAX * disp_vec
-    return desired_vel
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f", "--filename", help="filename, in case you want to save the animation")
-    args = parser.parse_args()
-    simulate(args.filename)

@@ -100,8 +100,8 @@ In this approach, it is the responsibility of each robot to find a feasible path
 **Execution**
 
 ```shell
-cd ./decentralized/velocity_obstacle
-python3 velocity_obstacle.py -f velocity_obstacle.avi
+cd ./decentralized
+python3 decentralized.py -f velocity_obstacle/velocity_obstacle.avi -m velocity_obstacle
 ```
 
 **Results**

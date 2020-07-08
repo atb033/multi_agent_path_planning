@@ -11,9 +11,6 @@ import numpy as np
 
 
 def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, sim_time, filename):
-    # Save animation gif
-    if not filename:
-        return
     fig = plt.figure()
     ax = fig.add_subplot(111, autoscale_on=False, xlim=(0, 10), ylim=(0, 10))
     ax.set_aspect('equal')
@@ -47,6 +44,10 @@ def plot_robot_and_obstacles(robot, obstacles, robot_radius, num_steps, sim_time
     for i in range(num_steps):
         animate(i)
         plt.pause(step)
+
+    # Save animation
+    if not filename:
+        return
 
     ani = animation.FuncAnimation(
         fig, animate, np.arange(1, num_steps), interval=200,
