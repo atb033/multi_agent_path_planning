@@ -20,7 +20,7 @@ In these methods, it is the responsibility of the central planner to provide a p
 
 SIPP is a local planner, using which, a collision-free plan can be generated, after considering the static and dynamic obstacles in the environment. In the case of multi-agent path planning, the other agents in the environment are considered as dynamic obstacles. 
 
-**Execution**
+#### Execution
 
 For SIPP multi-agent prioritized planning, run:
 
@@ -29,7 +29,7 @@ cd ./centralized/sipp
 python3 multi_sipp.py input.yaml output.yaml
 ```
 
-**Results**
+#### Results
 
 To visualize the generated results
 
@@ -51,7 +51,7 @@ python3 visualize_sipp.py input.yaml output.yaml --video 'sipp.avi' --speed 1
 
 Conclict-Based Search (CBS), is a multi-agent global path planner.
 
-**Execution**
+#### Execution
 
 Run:
 
@@ -60,7 +60,7 @@ cd ./centralized/cbs
 python3 cbs.py input.yaml output.yaml
 ```
 
-**Results**
+#### Results
 
 To visualize the generated results:
 
@@ -97,14 +97,14 @@ In this approach, it is the responsibility of each robot to find a feasible path
 
 ### Velocity obstacles
 
-**Execution**
+#### Execution
 
 ```shell
 cd ./decentralized
 python3 decentralized.py -f velocity_obstacle/velocity_obstacle.avi -m velocity_obstacle
 ```
 
-**Results**
+#### Results
 
 - Test 1: The robot tries to stay at (0, 0), while avoiding collisions with the dynamic obstacles
 - Test 2: The robot moves from (5, 0) to (5, 10), while avoiding obstacles
@@ -114,4 +114,27 @@ python3 decentralized.py -f velocity_obstacle/velocity_obstacle.avi -m velocity_
 |![Test1](./decentralized/velocity_obstacle/velocity_obstacle_1.gif)|![Test2](./decentralized/velocity_obstacle/velocity_obstacle_2.gif)|
 
 #### References
+
 - [The Hybrid Reciprocal Velocity Obstacle](http://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf)
+
+### Nonlinear Model-Predictive Control
+
+#### Execution
+
+```shell
+cd ./decentralized
+python3 decentralized.py -m nmpc
+```
+
+#### Results
+
+- Test 1: The robot tries to stay at (0, 0), while avoiding collisions with the dynamic obstacles
+- Test 2: The robot moves from (5, 0) to (5, 10), while avoiding obstacles
+
+| Test 1|Test 2|
+| :------------: | :------------: |
+|![Test1](./decentralized/nmpc/nmpc_1.gif)|![Test2](./decentralized/nmpc/nmpc_2.gif)|
+
+#### References
+
+- [Nonlinear Model Predictive Control for Multi-Micro Aerial Vehicle Robust Collision Avoidance](https://arxiv.org/abs/1703.01164)
