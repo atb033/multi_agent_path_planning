@@ -1,4 +1,5 @@
 import velocity_obstacle.velocity_obstacle as velocity_obstacle
+import nmpc.nmpc as nmpc
 import argparse
 
 if __name__ == "__main__":
@@ -12,6 +13,6 @@ if __name__ == "__main__":
     if args.mode == "velocity_obstacle":
         velocity_obstacle.simulate(args.filename)
     if args.mode == "nmpc":
-        print("nmpc is currently not implemented")
+        nmpc.simulate("")
     else:
         print("Please enter mode 0 or 1")
