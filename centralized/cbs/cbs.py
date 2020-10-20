@@ -252,11 +252,6 @@ class HighLevelNode(object):
     def __lt__(self, other):
         return self.cost < other.cost
 
-    def __str__(self):
-        res = ""
-        res+= "Node with cost {}\n".format(self.cost)
-        return str
-
 class CBS(object):
     def __init__(self, environment):
         self.env = environment
