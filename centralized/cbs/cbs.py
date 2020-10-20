@@ -39,20 +39,20 @@ class State(object):
 
 class Conflict(object):
     VERTEX = 1
-    EDGE = 2    
+    EDGE = 2
     def __init__(self):
         self.time = -1
         self.type = -1
 
         self.agent_1 = ''
         self.agent_2 = ''
-    
+
         self.location_1 = Location()
         self.location_2 = Location()
 
     def __str__(self):
         return '(' + str(self.time) + ', ' + self.agent_1 + ', ' + self.agent_2 + \
-             ', '+ str(self.location_1) + ', ' + str(self.location_2) + ')' 
+             ', '+ str(self.location_1) + ', ' + str(self.location_2) + ')'
 
 class VertexConstraint(object):
     def __init__(self, time, location):
@@ -62,9 +62,9 @@ class VertexConstraint(object):
     def __eq__(self, other):
         return self.time == other.time and self.location == other.location
     def __hash__(self):
-        return hash(str(self.time)+str(self.location))        
+        return hash(str(self.time)+str(self.location))
     def __str__(self):
-        return '(' + str(self.time) + ', '+ str(self.location) + ')' 
+        return '(' + str(self.time) + ', '+ str(self.location) + ')'
 
 class EdgeConstraint(object):
     def __init__(self, time, location_1, location_2):
@@ -77,7 +77,7 @@ class EdgeConstraint(object):
     def __hash__(self):
         return hash(str(self.time) + str(self.location_1) + str(self.location_2))
     def __str__(self):
-        return '(' + str(self.time) + ', '+ str(self.location_1) +', '+ str(self.location_2) + ')' 
+        return '(' + str(self.time) + ', '+ str(self.location_1) +', '+ str(self.location_2) + ')'
 
 class Constraints(object):
     def __init__(self):
@@ -109,7 +109,7 @@ class Environment(object):
 
     def get_neighbors(self, state):
         neighbors = []
-        
+
         # Wait action
         n = State(state.time + 1, state.location)
         if self.state_valid(n):
@@ -132,7 +132,7 @@ class Environment(object):
             neighbors.append(n)
         return neighbors
 
-        
+
     def get_first_conflict(self, solution):
         max_t = max([len(plan) for plan in solution.values()])
         result = Conflict()
@@ -162,7 +162,7 @@ class Environment(object):
                     result.agent_2 = agent_2
                     result.location_1 = state_1a.location
                     result.location_2 = state_1b.location
-                    return result                
+                    return result
         return False
 
     def create_constraints_from_conflict(self, conflict):
@@ -173,14 +173,14 @@ class Environment(object):
             constraint.vertex_constraints |= {v_constraint}
             constraint_dict[conflict.agent_1] = constraint
             constraint_dict[conflict.agent_2] = constraint
-        
+
         elif conflict.type == Conflict.EDGE:
             constraint1 = Constraints()
             constraint2 = Constraints()
 
             e_constraint1 = EdgeConstraint(conflict.time, conflict.location_1, conflict.location_2)
             e_constraint2 = EdgeConstraint(conflict.time, conflict.location_2, conflict.location_1)
-        
+
             constraint1.edge_constraints |= {e_constraint1}
             constraint2.edge_constraints |= {e_constraint2}
 
@@ -220,7 +220,7 @@ class Environment(object):
         for agent in self.agents:
             start_state = State(0, Location(agent['start'][0], agent['start'][1]))
             goal_state = State(0, Location(agent['goal'][0], agent['goal'][1]))
-            
+
             self.agent_dict.update({agent['name']:{'start':start_state, 'goal':goal_state}})
 
     def compute_solution(self):
@@ -242,13 +242,26 @@ class HighLevelNode(object):
         self.constraint_dict = {}
         self.cost = 0
 
+    def __eq__(self, other):
+        if not isinstance(other, type(self)): return NotImplemented
+        return self.solution == other.solution and self.cost == other.cost
+
+    def __hash__(self):
+        return hash((self.cost))
+
     def __lt__(self, other):
         return self.cost < other.cost
 
+    def __str__(self):
+        res = ""
+        res+= "Node with cost {}\n".format(self.cost)
+        return str
+
 class CBS(object):
     def __init__(self, environment):
-        self.env = environment 
+        self.env = environment
         self.open_set = set()
+        self.closed_set = set()
     def search(self):
         start = HighLevelNode()
         # TODO: Initialize it in a better way
@@ -265,10 +278,10 @@ class CBS(object):
         while self.open_set:
             P = min(self.open_set)
             self.open_set -= {P}
+            self.closed_set |= {P}
 
             self.env.constraint_dict = P.constraint_dict
             conflict_dict = self.env.get_first_conflict(P.solution)
-
             if not conflict_dict:
                 print("solution found")
 
@@ -278,16 +291,17 @@ class CBS(object):
 
             for agent in constraint_dict.keys():
                 new_node = deepcopy(P)
-                new_node.constraint_dict[agent].add_constraint(constraint_dict[agent]) 
-                
+                new_node.constraint_dict[agent].add_constraint(constraint_dict[agent])
+
                 self.env.constraint_dict = new_node.constraint_dict
                 new_node.solution = self.env.compute_solution()
                 if not new_node.solution:
                     continue
                 new_node.cost = self.env.compute_solution_cost(new_node.solution)
 
-                # TODO: ending condition 
-                self.open_set |= {new_node}
+                # TODO: ending condition
+                if new_node not in self.closed_set:
+                    self.open_set |= {new_node}
 
         return {}
 
@@ -304,7 +318,7 @@ def main():
     parser.add_argument("param", help="input file containing map and obstacles")
     parser.add_argument("output", help="output file with the schedule")
     args = parser.parse_args()
-    
+
     # Read from input file
     with open(args.param, 'r') as param_file:
         try:
@@ -322,7 +336,7 @@ def main():
     cbs = CBS(env)
     solution = cbs.search()
     if not solution:
-        print(" Solution not found" ) 
+        print(" Solution not found" )
         return
 
     # Write to output file
@@ -335,8 +349,8 @@ def main():
     output["schedule"] = solution
     output["cost"] = env.compute_solution_cost(solution)
     with open(args.output, 'w') as output_yaml:
-        yaml.safe_dump(output, output_yaml)  
-        
-    
+        yaml.safe_dump(output, output_yaml)
+
+
 if __name__ == "__main__":
     main()
