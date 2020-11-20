@@ -12,6 +12,14 @@ This repository consists of the implementation of some multi-agent path-planning
       - [Post-processing of plan using Temporal Plan Graph](#post-processing-with-tpg)
 - [Decentralized solutions](#decentralized-solutions)
 
+## Dependencies
+
+Install the necessary dependencies by running
+
+```shell
+pip3 install -r requirements.txt
+```
+
 ## Centralized Solutions
 
 In these methods, it is the responsibility of the central planner to provide a plan to the robots.
