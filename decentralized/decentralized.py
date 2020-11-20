@@ -12,7 +12,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.mode == "velocity_obstacle":
         velocity_obstacle.simulate(args.filename)
-    if args.mode == "nmpc":
+    elif args.mode == "nmpc":
         nmpc.simulate(args.filename)
     else:
-        print("Please enter mode 0 or 1")
+        print("Please enter mode the desired mode: velocity_obstacle or nmpc")
