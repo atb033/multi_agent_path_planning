@@ -55,6 +55,10 @@ python3 visualize_sipp.py input.yaml output.yaml --video 'sipp.avi' --speed 1
 |:--------------------------------------:|:--------------------------------------:|
 | ![Success](./centralized/sipp/results/success.gif) | ![Failure](./centralized/sipp/results/failure.gif)|
 
+#### Reference
+
+- [SIPP: Safe Interval Path Planning for Dynamic Environments](https://www.cs.cmu.edu/~maxim/files/sipp_icra11.pdf)
+
 ### Conflict Based Search
 
 Conclict-Based Search (CBS), is a multi-agent global path planner.
@@ -83,6 +87,10 @@ python3 ../visualize.py input.yaml output.yaml
 |               8x8 grid              |              32x32 grid             |
 |:-----------------------------------:|:-----------------------------------:|
 | ![Test 3](./centralized/cbs/results/test_3.gif) | ![Test 4](./centralized/cbs/results/test_4.gif)|
+
+#### Reference
+
+- [Conflict-based search for optimal multi-agent pathfinding](https://www.sciencedirect.com/science/article/pii/S0004370214001386)
 
 ### Post-Processing
 
