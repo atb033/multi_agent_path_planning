@@ -14,7 +14,7 @@ This repository consists of the implementation of some multi-agent path-planning
 
 ## Dependencies
 
-Install the necessary dependencies by running
+Install the necessary dependencies by running.
 
 ```shell
 pip3 install -r requirements.txt
