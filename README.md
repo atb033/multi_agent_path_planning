@@ -11,6 +11,8 @@ This repository consists of the implementation of some multi-agent path-planning
    - [Post-Processing](#post-processing)
       - [Post-processing of plan using Temporal Plan Graph](#post-processing-with-tpg)
 - [Decentralized solutions](#decentralized-solutions)
+   - [Velocity obstacles](#velocity-obstacles)
+   - [Nonlinear Model-Predictive Control](#nonlinear-model-predictive-control)
 
 ## Dependencies
 
