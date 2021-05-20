@@ -1,4 +1,4 @@
-# Multi-Agent path planning in python
+# Multi-Agent path planning in Python
 
 ## Introduction
 
