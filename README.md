@@ -124,7 +124,7 @@ python3 decentralized.py -f velocity_obstacle/velocity_obstacle.avi -m velocity_
 
 #### Results
 
-- Test 1: The robot tries to stay at (0, 0), while avoiding collisions with the dynamic obstacles
+- Test 1: The robot tries to stay at (5, 5), while avoiding collisions with the dynamic obstacles
 - Test 2: The robot moves from (5, 0) to (5, 10), while avoiding obstacles
 
 | Test 1|Test 2|
@@ -146,7 +146,7 @@ python3 decentralized.py -m nmpc
 
 #### Results
 
-- Test 1: The robot tries to stay at (0, 0), while avoiding collisions with the dynamic obstacles
+- Test 1: The robot tries to stay at (5, 5), while avoiding collisions with the dynamic obstacles
 - Test 2: The robot moves from (5, 0) to (5, 10), while avoiding obstacles
 
 | Test 1|Test 2|
