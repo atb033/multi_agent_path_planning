@@ -4,22 +4,36 @@
 
 This repository consists of the implementation of some multi-agent path-planning algorithms in Python. The following algorithms are currently implemented:
 
-- [Centralized Solutions](#centralized-solutions)
-   - [Algorithms](Algorithms)
-      - [Prioritized Safe-Interval Path Planning (SIPP)](#prioritized-safe-interval-path-planning)
-      - [Conflict-Based Search (CBS)](#conflict-based-search)
-   - [Post-Processing](#post-processing)
-      - [Post-processing of plan using Temporal Plan Graph](#post-processing-with-tpg)
-- [Decentralized solutions](#decentralized-solutions)
-   - [Velocity obstacles](#velocity-obstacles)
-   - [Nonlinear Model-Predictive Control](#nonlinear-model-predictive-control)
+- [Multi-Agent path planning in Python](#multi-agent-path-planning-in-python)
+  - [Introduction](#introduction)
+  - [Dependencies](#dependencies)
+  - [Centralized Solutions](#centralized-solutions)
+    - [Prioritized Safe-Interval Path Planning](#prioritized-safe-interval-path-planning)
+      - [Execution](#execution)
+      - [Results](#results)
+      - [Reference](#reference)
+    - [Conflict Based Search](#conflict-based-search)
+      - [Execution](#execution-1)
+      - [Results](#results-1)
+      - [Reference](#reference-1)
+    - [Post-Processing](#post-processing)
+      - [Post-processing with TPG](#post-processing-with-tpg)
+  - [Decentralized solutions](#decentralized-solutions)
+    - [Velocity obstacles](#velocity-obstacles)
+      - [Execution](#execution-2)
+      - [Results](#results-2)
+      - [References](#references)
+    - [Nonlinear Model-Predictive Control](#nonlinear-model-predictive-control)
+      - [Execution](#execution-3)
+      - [Results](#results-3)
+      - [References](#references-1)
 
 ## Dependencies
 
 Install the necessary dependencies by running.
 
 ```shell
-pip3 install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 ## Centralized Solutions
