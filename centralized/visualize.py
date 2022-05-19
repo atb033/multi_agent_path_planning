@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 import yaml
-import matplotlib
-# matplotlib.use("Agg")
-from matplotlib.patches import Circle, Rectangle, Arrow
-from matplotlib.collections import PatchCollection
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib import animation
-import matplotlib.animation as manimation
 import argparse
-import math
+# import matplotlib
+# matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib import animation
+from matplotlib.patches import Circle, Rectangle
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+import numpy as np
 
 Colors = ['orange', 'blue', 'green']
 
 
 class Animation:
-  def __init__(self, map, schedule):
+  def __init__(self, map, schedule, video=False):
     self.map = map
     self.schedule = schedule
     self.combined_schedule = {}
@@ -26,12 +24,12 @@ class Animation:
     self.fig = plt.figure(frameon=False, figsize=(4 * aspect, 4))
     self.ax = self.fig.add_subplot(111, aspect='equal')
     self.fig.subplots_adjust(left=0,right=1,bottom=0,top=1, wspace=None, hspace=None)
-    # self.ax.set_frame_on(False)
 
     self.patches = []
     self.artists = []
     self.agents = dict()
     self.agent_names = dict()
+
     # create boundary patch
     xmin = -0.5
     ymin = -0.5
@@ -41,11 +39,6 @@ class Animation:
     # self.ax.relim()
     plt.xlim(xmin, xmax)
     plt.ylim(ymin, ymax)
-    # self.ax.set_xticks([])
-    # self.ax.set_yticks([])
-    # plt.axis('off')
-    # self.ax.axis('tight')
-    # self.ax.axis('off')
 
     self.patches.append(Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, facecolor='none', edgecolor='red'))
     for o in map["map"]["obstacles"]:
@@ -68,11 +61,11 @@ class Animation:
       self.agent_names[name].set_verticalalignment('center')
       self.artists.append(self.agent_names[name])
 
-    # self.ax.set_axis_off()
-    # self.fig.axes[0].set_visible(False)
-    # self.fig.axes.get_yaxis().set_visible(False)
-
-    # self.fig.tight_layout()
+    # Generate the canvas before the FuncaAnimation is generated.
+    # This is needed for the save-to-video-functionality, but will break the regular
+    # functionality of plotting the results on screen.
+    if video:
+      self.canvas = FigureCanvasAgg(self.fig)
 
     self.anim = animation.FuncAnimation(self.fig, self.animate_func,
                                init_func=self.init_func,
@@ -85,8 +78,7 @@ class Animation:
       file_name,
       "ffmpeg",
       fps=10 * speed,
-      dpi=200),
-      # savefig_kwargs={"pad_inches": 0, "bbox_inches": "tight"})
+      dpi=200)
 
   def show(self):
     plt.show()
@@ -124,7 +116,6 @@ class Animation:
 
     return self.patches + self.artists
 
-
   def getState(self, t, d):
     idx = 0
     while idx < len(d) and d[idx]["t"] < t:
@@ -142,7 +133,6 @@ class Animation:
     return pos
 
 
-
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("map", help="input file containing map")
@@ -151,16 +141,15 @@ if __name__ == "__main__":
   parser.add_argument("--speed", type=int, default=1, help="speedup-factor")
   args = parser.parse_args()
 
-
   with open(args.map) as map_file:
     map = yaml.load(map_file, Loader=yaml.FullLoader)
 
   with open(args.schedule) as states_file:
     schedule = yaml.load(states_file, Loader=yaml.FullLoader)
 
-  animation = Animation(map, schedule)
-
   if args.video:
+    animation = Animation(map, schedule, video=True)
     animation.save(args.video, args.speed)
   else:
+    animation = Animation(map, schedule)
     animation.show()
