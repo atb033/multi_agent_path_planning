@@ -335,11 +335,14 @@ def main():
         return
 
     # Write to output file
-    with open(args.output, 'r') as output_yaml:
-        try:
-            output = yaml.load(output_yaml, Loader=yaml.FullLoader)
-        except yaml.YAMLError as exc:
-            print(exc)
+    try:
+        with open(args.output, 'r') as output_yaml:
+            try:
+                output = yaml.load(output_yaml, Loader=yaml.FullLoader)
+            except yaml.YAMLError as exc:
+                print(exc)
+    except FileNotFoundError:
+        output = dict()
 
     output["schedule"] = solution
     output["cost"] = env.compute_solution_cost(solution)
