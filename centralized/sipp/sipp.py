@@ -123,11 +123,9 @@ def main():
         except yaml.YAMLError as exc:
             print(exc)
 
-    with open(args.output, 'r') as output_yaml:
-        try:
-            output = yaml.load(output_yaml, Loader=yaml.FullLoader)
-        except yaml.YAMLError as exc:
-            print(exc)
+
+    output = dict()
+    output["schedule"] = dict()
 
     # compute first plan
     sipp_planner = SippPlanner(map,0)

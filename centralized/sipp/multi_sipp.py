@@ -29,11 +29,8 @@ def main():
             print(exc)
 
     # Output file
-    with open(args.output, 'r') as output_yaml:
-        try:
-            output = yaml.load(output_yaml, Loader=yaml.FullLoader)
-        except yaml.YAMLError as exc:
-            print(exc)
+    output = dict()
+    output["schedule"] = dict()
 
     for i in range(len(map["agents"])):
         sipp_planner = SippPlanner(map,i)
