@@ -11,6 +11,7 @@ python = ">=3.9,<3.12"
 matplotlib = "^3.7.1"
 scipy = "^1.10.1"
 ffmpeg-python = "^0.2.0"
+pyyaml = "^6.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
