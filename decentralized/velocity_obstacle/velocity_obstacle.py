@@ -9,9 +9,9 @@ from utils.create_obstacles import create_obstacles
 from utils.control import compute_desired_velocity
 import numpy as np
 
-SIM_TIME = 5.
+SIM_TIME = 5.0
 TIMESTEP = 0.1
-NUMBER_OF_TIMESTEPS = int(SIM_TIME/TIMESTEP)
+NUMBER_OF_TIMESTEPS = int(SIM_TIME / TIMESTEP)
 ROBOT_RADIUS = 0.5
 VMAX = 2
 VMIN = 0.2
@@ -27,13 +27,18 @@ def simulate(filename):
     robot_state_history = np.empty((4, NUMBER_OF_TIMESTEPS))
     for i in range(NUMBER_OF_TIMESTEPS):
         v_desired = compute_desired_velocity(robot_state, goal, ROBOT_RADIUS, VMAX)
-        control_vel = compute_velocity(
-            robot_state, obstacles[:, i, :], v_desired)
+        control_vel = compute_velocity(robot_state, obstacles[:, i, :], v_desired)
         robot_state = update_state(robot_state, control_vel)
         robot_state_history[:4, i] = robot_state
 
     plot_robot_and_obstacles(
-        robot_state_history, obstacles, ROBOT_RADIUS, NUMBER_OF_TIMESTEPS, SIM_TIME, filename)
+        robot_state_history,
+        obstacles,
+        ROBOT_RADIUS,
+        NUMBER_OF_TIMESTEPS,
+        SIM_TIME,
+        filename,
+    )
 
 
 def compute_velocity(robot, obstacles, v_desired):
@@ -52,22 +57,22 @@ def compute_velocity(robot, obstacles, v_desired):
         distBA = np.linalg.norm(dispBA)
         thetaBA = np.arctan2(dispBA[1], dispBA[0])
         if 2.2 * ROBOT_RADIUS > distBA:
-            distBA = 2.2*ROBOT_RADIUS
-        phi_obst = np.arcsin(2.2*ROBOT_RADIUS/distBA)
+            distBA = 2.2 * ROBOT_RADIUS
+        phi_obst = np.arcsin(2.2 * ROBOT_RADIUS / distBA)
         phi_left = thetaBA + phi_obst
         phi_right = thetaBA - phi_obst
 
         # VO
         translation = vB
         Atemp, btemp = create_constraints(translation, phi_left, "left")
-        Amat[i*2, :] = Atemp
-        bvec[i*2] = btemp
+        Amat[i * 2, :] = Atemp
+        bvec[i * 2] = btemp
         Atemp, btemp = create_constraints(translation, phi_right, "right")
-        Amat[i*2 + 1, :] = Atemp
-        bvec[i*2 + 1] = btemp
+        Amat[i * 2 + 1, :] = Atemp
+        bvec[i * 2 + 1] = btemp
 
     # Create search-space
-    th = np.linspace(0, 2*np.pi, 20)
+    th = np.linspace(0, 2 * np.pi, 20)
     vel = np.linspace(0, VMAX, 5)
 
     vv, thth = np.meshgrid(vel, th)
@@ -81,11 +86,12 @@ def compute_velocity(robot, obstacles, v_desired):
 
     # Objective function
     size = np.shape(v_satisfying_constraints)[1]
-    diffs = v_satisfying_constraints - \
-        ((v_desired).reshape(2, 1) @ np.ones(size).reshape(1, size))
+    diffs = v_satisfying_constraints - (
+        (v_desired).reshape(2, 1) @ np.ones(size).reshape(1, size)
+    )
     norm = np.linalg.norm(diffs, axis=0)
     min_index = np.where(norm == np.amin(norm))[0][0]
-    cmd_vel = (v_satisfying_constraints[:, min_index])
+    cmd_vel = v_satisfying_constraints[:, min_index]
 
     return cmd_vel
 
@@ -93,8 +99,10 @@ def compute_velocity(robot, obstacles, v_desired):
 def check_constraints(v_sample, Amat, bvec):
     length = np.shape(bvec)[0]
 
-    for i in range(int(length/2)):
-        v_sample = check_inside(v_sample, Amat[2*i:2*i+2, :], bvec[2*i:2*i+2])
+    for i in range(int(length / 2)):
+        v_sample = check_inside(
+            v_sample, Amat[2 * i : 2 * i + 2, :], bvec[2 * i : 2 * i + 2]
+        )
 
     return v_sample
 

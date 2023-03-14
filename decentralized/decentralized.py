@@ -5,9 +5,13 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-m", "--mode", help="mode of obstacle avoidance; options: velocity_obstacle, or nmpc")
+        "-m",
+        "--mode",
+        help="mode of obstacle avoidance; options: velocity_obstacle, or nmpc",
+    )
     parser.add_argument(
-        "-f", "--filename", help="filename, in case you want to save the animation")
+        "-f", "--filename", help="filename, in case you want to save the animation"
+    )
 
     args = parser.parse_args()
     if args.mode == "velocity_obstacle":
