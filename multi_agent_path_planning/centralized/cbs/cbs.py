@@ -14,7 +14,7 @@ from math import fabs
 from itertools import combinations
 from copy import deepcopy
 
-from cbs.a_star import AStar
+from multi_agent_path_planning.centralized.cbs.a_star import AStar
 
 
 class Location(object):

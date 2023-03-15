@@ -11,8 +11,9 @@ See the article: 10.1109/ICRA.2011.5980306
 import argparse
 import yaml
 from math import fabs
-from graph_generation import SippGraph, State
-from sipp import SippPlanner
+
+from multi_agent_path_planning.centralized.sipp.graph_generation import SippGraph, State
+from multi_agent_path_planning.centralized.sipp.sipp import SippPlanner
 
 
 def main():

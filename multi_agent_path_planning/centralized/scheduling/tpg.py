@@ -11,7 +11,7 @@ sys.path.insert(0, "../")
 import yaml
 import argparse
 
-from cbs.cbs import Location
+from multi_agent_path_planning.centralized.cbs.cbs import Location
 
 
 class Vertex:

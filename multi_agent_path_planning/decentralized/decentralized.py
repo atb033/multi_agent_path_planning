@@ -1,5 +1,7 @@
-import velocity_obstacle.velocity_obstacle as velocity_obstacle
-import nmpc.nmpc as nmpc
+from multi_agent_path_planning.decentralized.velocity_obstacle import (
+    velocity_obstacle as velocity_obstacle,
+)
+from multi_agent_path_planning.decentralized.nmpc import nmpc
 import argparse
 
 if __name__ == "__main__":

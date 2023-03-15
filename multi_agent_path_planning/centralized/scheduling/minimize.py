@@ -4,9 +4,12 @@ sys.path.insert(0, "../")
 import yaml
 import argparse
 
-from scheduling.tpg import Vertex, TemporalPlanGraph
-from scheduling.stn import SimpleTemporalNetwork
-from cbs.cbs import Location
+from multi_agent_path_planning.centralized.scheduling.tpg import (
+    Vertex,
+    TemporalPlanGraph,
+)
+from multi_agent_path_planning.centralized.scheduling.stn import SimpleTemporalNetwork
+from multi_agent_path_planning.centralized.cbs.cbs import Location
 
 from scipy.optimize import linprog
 

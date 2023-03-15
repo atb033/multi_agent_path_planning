@@ -4,8 +4,12 @@ Collision avoidance using Nonlinear Model-Predictive Control
 author: Ashwin Bose (atb033@github.com)
 """
 
-from utils.multi_robot_plot import plot_robot_and_obstacles
-from utils.create_obstacles import create_obstacles
+from multi_agent_path_planning.decentralized.utils.multi_robot_plot import (
+    plot_robot_and_obstacles,
+)
+from multi_agent_path_planning.decentralized.utils.create_obstacles import (
+    create_obstacles,
+)
 import numpy as np
 from scipy.optimize import minimize, Bounds
 import time
