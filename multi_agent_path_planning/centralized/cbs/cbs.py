@@ -389,7 +389,6 @@ def main():
             param = yaml.load(param_file, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
             print(exc)
-    breakpoint()
     dimension = param["map"]["dimensions"]
     obstacles = param["map"]["obstacles"]
     agents = param["agents"]
