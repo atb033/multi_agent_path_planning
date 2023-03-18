@@ -1,6 +1,6 @@
 import typing
 
-from multi_agent_path_planning.lifelong_MAPF.datastuctures import Agent
+from multi_agent_path_planning.lifelong_MAPF.datastuctures import Agent, Map
 from multi_agent_path_planning.lifelong_MAPF.dynamics_simulator import (
     BaseDynamicsSimulator,
 )
@@ -10,7 +10,7 @@ from multi_agent_path_planning.lifelong_MAPF.task_factory import BaseTaskFactory
 
 
 def lifelong_MAPF_experiment(
-    map_instance,
+    map_instance: Map,
     initial_agents: typing.Dict[int, Agent],
     task_factory: BaseTaskFactory,
     task_allocator: BaseTaskAllocator,
@@ -69,7 +69,7 @@ def lifelong_MAPF_experiment(
         # Plan all the required paths. This can both be to get the agents to the starts of tasks
         # or get from their current location to the goal
         planned_paths = mapf_solver.solve_MAPF_instance(
-            map=map,
+            map=map_instance,
             assignments=assigned_tasks,
             planned_paths=planned_paths,
             timestep=timestep,
@@ -94,7 +94,7 @@ def lifelong_MAPF_experiment(
 
 if __name__ == "__main__":
     lifelong_MAPF_experiment(
-        None,
+        Map(None),
         initial_agents={},
         task_factory=BaseTaskFactory(),
         task_allocator=BaseTaskAllocator(),
