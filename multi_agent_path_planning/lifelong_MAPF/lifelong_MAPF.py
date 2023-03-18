@@ -17,8 +17,8 @@ def main():
     args = parser.parse_args()
     
     output = lifelong_MAPF_experiment(
-                Map(args.input),
-                make_agent_dict(args.input),
+                map_instance=Map(args.input),
+                initial_agents=make_agent_dict(args.input),
                 task_factory=BaseTaskFactory(),
                 task_allocator=BaseTaskAllocator(),
                 mapf_solver=BaseMAPFSolver(),
