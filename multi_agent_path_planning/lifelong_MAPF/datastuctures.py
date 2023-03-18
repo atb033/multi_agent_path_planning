@@ -1,3 +1,5 @@
+import yaml 
+
 class Task:
     def __init__(self, start, goal, timestep):
         self.start = start
@@ -27,10 +29,20 @@ class Agent:
 
 class Map:
     def __init__(self, map):
-        self.map = map
+        with open(map, "r") as map_file:
+            try:
+                temp = yaml.load(map_file, Loader=yaml.FullLoader)
+                print(temp)
+                print(temp['map'])
+            except yaml.YAMLError as exc:
+                print(exc)
+
 
 
 class Assignment:
     def __init__(self, task: Task, agent: Agent) -> None:
         self.task = task
         self.agent = agent
+
+if __name__ == "__main__":
+    map1 = Map('input.yaml')
