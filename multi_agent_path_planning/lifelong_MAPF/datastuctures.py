@@ -43,6 +43,3 @@ class Assignment:
     def __init__(self, task: Task, agent: Agent) -> None:
         self.task = task
         self.agent = agent
-
-if __name__ == "__main__":
-    map1 = Map('input.yaml')
