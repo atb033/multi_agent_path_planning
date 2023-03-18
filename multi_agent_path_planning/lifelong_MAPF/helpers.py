@@ -10,3 +10,4 @@ def make_agent_dict(input):
     for agent in temp["agents"]:    
         agents[agent['name']] = agent['start']
     return agents
+    
