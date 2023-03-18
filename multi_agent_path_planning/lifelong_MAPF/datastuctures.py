@@ -31,7 +31,7 @@ class Map:
     def __init__(self, map):
         with open(map, "r") as map_file:
             try:
-                self.testmap = yaml.load(map_file, Loader=yaml.FullLoader)['map']
+                self.map_dict = yaml.load(map_file, Loader=yaml.FullLoader)['map']
             except yaml.YAMLError as exc:
                 print(exc)
 
