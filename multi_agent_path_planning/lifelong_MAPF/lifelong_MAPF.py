@@ -1,4 +1,5 @@
 import typing
+import argparse
 
 from multi_agent_path_planning.lifelong_MAPF.datastuctures import Agent, Map
 from multi_agent_path_planning.lifelong_MAPF.dynamics_simulator import (
@@ -7,6 +8,26 @@ from multi_agent_path_planning.lifelong_MAPF.dynamics_simulator import (
 from multi_agent_path_planning.lifelong_MAPF.mapf_solver import BaseMAPFSolver
 from multi_agent_path_planning.lifelong_MAPF.task_allocator import BaseTaskAllocator
 from multi_agent_path_planning.lifelong_MAPF.task_factory import BaseTaskFactory
+from multi_agent_path_planning.lifelong_MAPF.helpers import *
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input", help="input file")
+    parser.add_argument("output", help="output file with the schedule")
+    args = parser.parse_args()
+    
+    output = lifelong_MAPF_experiment(
+                map_instance=Map(args.input),
+                initial_agents=make_agent_dict(args.input),
+                task_factory=BaseTaskFactory(),
+                task_allocator=BaseTaskAllocator(),
+                mapf_solver=BaseMAPFSolver(),
+                dynamics_simulator=BaseDynamicsSimulator(),
+    )
+
+    # refine this later 
+    with open(args.output, "w") as output_yaml:
+        yaml.safe_dump(output, output_yaml)
 
 
 def lifelong_MAPF_experiment(
@@ -93,11 +114,4 @@ def lifelong_MAPF_experiment(
 
 
 if __name__ == "__main__":
-    lifelong_MAPF_experiment(
-        Map(None),
-        initial_agents={},
-        task_factory=BaseTaskFactory(),
-        task_allocator=BaseTaskAllocator(),
-        mapf_solver=BaseMAPFSolver(),
-        dynamics_simulator=BaseDynamicsSimulator(),
-    )
+    main()
