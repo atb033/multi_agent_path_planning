@@ -1,8 +1,10 @@
 import typing
 
-from multi_agent_path_planning.lifelong_MAPF.datastuctures import (Agent,
-                                                                   Assignment,
-                                                                   Task)
+from multi_agent_path_planning.lifelong_MAPF.datastuctures import (
+    Agent,
+    Assignment,
+    Task,
+)
 
 
 class BaseTaskAllocator:

@@ -1,31 +1,33 @@
-import typing
 import argparse
+import typing
 
 from multi_agent_path_planning.lifelong_MAPF.datastuctures import Agent, Map
 from multi_agent_path_planning.lifelong_MAPF.dynamics_simulator import (
     BaseDynamicsSimulator,
 )
+from multi_agent_path_planning.lifelong_MAPF.helpers import *
 from multi_agent_path_planning.lifelong_MAPF.mapf_solver import BaseMAPFSolver
 from multi_agent_path_planning.lifelong_MAPF.task_allocator import BaseTaskAllocator
 from multi_agent_path_planning.lifelong_MAPF.task_factory import BaseTaskFactory
-from multi_agent_path_planning.lifelong_MAPF.helpers import *
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="input file")
     parser.add_argument("output", help="output file with the schedule")
     args = parser.parse_args()
-    
+
     output = lifelong_MAPF_experiment(
-                map_instance=Map(args.input),
-                initial_agents=make_agent_dict(args.input),
-                task_factory=BaseTaskFactory(),
-                task_allocator=BaseTaskAllocator(),
-                mapf_solver=BaseMAPFSolver(),
-                dynamics_simulator=BaseDynamicsSimulator(),
+        map_instance=Map(args.input),
+        # TODO: fix make agent dict to be really great! :P
+        initial_agents=make_agent_dict(args.input),
+        task_factory=BaseTaskFactory(),
+        task_allocator=BaseTaskAllocator(),
+        mapf_solver=BaseMAPFSolver(),
+        dynamics_simulator=BaseDynamicsSimulator(),
     )
 
-    # refine this later 
+    # refine this later
     with open(args.output, "w") as output_yaml:
         yaml.safe_dump(output, output_yaml)
 
@@ -52,22 +54,10 @@ def lifelong_MAPF_experiment(
     # It should be a List[Task]
     open_tasks = []
 
+    # TODO: fix comment
     # This is the set of agents which are ready to accept a new task assignment
     # It should be a dict[int, Agent]
-    unallocated_agents = initial_agents
-
-    # This is the set of agents which are already assigned to a location. This location could
-    # either be the start or goal of a task
-    # It should be a dict[int, Agent]
-    allocated_agents = {}
-
-    # The paths which have already been planned
-    # Should be a List[Path]
-    planned_paths = []
-
-    # The list of locations which have already been visited by each agent.
-    # It should be a List[Path]
-    completed_paths = []
+    agents = initial_agents
 
     # Agents are not all at their goals
     agents_at_goals = False
@@ -85,28 +75,22 @@ def lifelong_MAPF_experiment(
             break
 
         # Assign the open tasks to the open agents
-        assigned_tasks = task_allocator.allocate_tasks(open_tasks, unallocated_agents)
+        agents = task_allocator.allocate_tasks(open_tasks, agents)
 
         # Plan all the required paths. This can both be to get the agents to the starts of tasks
         # or get from their current location to the goal
-        planned_paths = mapf_solver.solve_MAPF_instance(
+        agents = mapf_solver.solve_MAPF_instance(
             map=map_instance,
-            assignments=assigned_tasks,
-            planned_paths=planned_paths,
+            agents=agents,
             timestep=timestep,
         )
 
         # Step the simulation one step and record the paths
         (
-            completed_paths,
-            allocated_agents,
-            unallocated_agents,
             agents_at_goals,
+            agents,
         ) = dynamics_simulator.step_world(
-            planned_paths=planned_paths,
-            completed_paths=completed_paths,
-            allocated_agents=allocated_agents,
-            unallocated_agents=unallocated_agents,
+            agents=agents,
             timestep=timestep,
         )
 
