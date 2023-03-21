@@ -20,7 +20,7 @@ def main():
     output = lifelong_MAPF_experiment(
         map_instance=Map(args.input),
         # TODO: fix make agent dict to be really great! :P
-        initial_agents=make_agent_dict(args.input),
+        initial_agents=make_agent_set(args.input),
         task_factory=BaseTaskFactory(),
         task_allocator=BaseTaskAllocator(),
         mapf_solver=BaseMAPFSolver(),
@@ -56,7 +56,6 @@ def lifelong_MAPF_experiment(
 
     # TODO: fix comment
     # This is the set of agents which are ready to accept a new task assignment
-    # It should be a dict[int, Agent]
     agents = initial_agents
 
     # Agents are not all at their goals
@@ -80,22 +79,17 @@ def lifelong_MAPF_experiment(
         # Plan all the required paths. This can both be to get the agents to the starts of tasks
         # or get from their current location to the goal
         agents = mapf_solver.solve_MAPF_instance(
-            map=map_instance,
-            agents=agents,
-            timestep=timestep,
+            map=map_instance, agents=agents, timestep=timestep,
         )
 
         # Step the simulation one step and record the paths
-        (
-            agents_at_goals,
-            agents,
-        ) = dynamics_simulator.step_world(
-            agents=agents,
-            timestep=timestep,
+        (agents, agents_at_goals) = dynamics_simulator.step_world(
+            agents=agents, timestep=timestep,
         )
 
-    return completed_paths
+    executed_paths = agents.get_executed_paths()
+    return executed_paths
 
 
 if __name__ == "__main__":
-    main()
+    paths = main()

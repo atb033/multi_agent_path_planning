@@ -1,7 +1,8 @@
 import yaml
+from datastuctures import AgentSet, Agent
 
 
-def make_agent_dict(input):
+def make_agent_set(input):
     """_summary_
 
     Args:
@@ -16,8 +17,8 @@ def make_agent_dict(input):
         except yaml.YAMLError as exc:
             print(exc)
     # encorporate the actual agent class!
-    agents = {}
+    agent_list = []
     for agent in temp["agents"]:
-        # encorporate the actual agent class!
-        agents[agent["name"]] = agent["start"]
-    return agents
+        agent_list.append(Agent(loc=agent["start"], ID=agent["name"]))
+    agent_set = AgentSet(agent_list)
+    return agent_set

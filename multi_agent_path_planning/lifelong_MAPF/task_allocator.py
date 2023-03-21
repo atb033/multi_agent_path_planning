@@ -1,7 +1,7 @@
 import typing
 
 from multi_agent_path_planning.lifelong_MAPF.datastuctures import (
-    Agent,
+    AgentSet,
     Assignment,
     Task,
 )
@@ -13,7 +13,7 @@ class BaseTaskAllocator:
     """
 
     def allocate_tasks(
-        self, tasks: typing.List[Task], agents: typing.Dict[int, Agent]
+        self, tasks: typing.List[Task], agents: AgentSet
     ) -> typing.List[Assignment]:
         """
         Arguments:
@@ -21,6 +21,6 @@ class BaseTaskAllocator:
             agents:
 
         Returns:
-            a list of assignments
+            Agents updated with assignments
         """
-        return []
+        return agents
