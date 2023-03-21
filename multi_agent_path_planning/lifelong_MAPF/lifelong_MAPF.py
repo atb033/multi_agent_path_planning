@@ -7,7 +7,10 @@ from multi_agent_path_planning.lifelong_MAPF.dynamics_simulator import (
 )
 from multi_agent_path_planning.lifelong_MAPF.helpers import *
 from multi_agent_path_planning.lifelong_MAPF.mapf_solver import BaseMAPFSolver
-from multi_agent_path_planning.lifelong_MAPF.task_allocator import BaseTaskAllocator
+from multi_agent_path_planning.lifelong_MAPF.task_allocator import (
+    BaseTaskAllocator,
+    RandomTaskAllocator,
+)
 from multi_agent_path_planning.lifelong_MAPF.task_factory import (
     BaseTaskFactory,
     RandomTaskFactory,
@@ -24,10 +27,9 @@ def main():
 
     output = lifelong_MAPF_experiment(
         map_instance=world_map,
-        # TODO: fix make agent dict to be really great! :P
         initial_agents=make_agent_set(args.input),
         task_factory=RandomTaskFactory(world_map),
-        task_allocator=BaseTaskAllocator(),
+        task_allocator=RandomTaskAllocator(),
         mapf_solver=BaseMAPFSolver(),
         dynamics_simulator=BaseDynamicsSimulator(),
     )

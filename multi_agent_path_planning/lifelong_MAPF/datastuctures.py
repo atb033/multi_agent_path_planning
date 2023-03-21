@@ -53,19 +53,31 @@ class Agent:
     # if task[1] == loc
     #   make goal and task null
     # method to take desired path and update the location
+    def set_task(self, task: Task):
+        self.task = task
+
     def get_executed_path(self):
         return self.executed_path
+
+    def is_allocated(self):
+        return self.goal is not None
 
 
 class AgentSet:
     def __init__(self, agents: typing.List[Agent]):
         self.agents = agents
 
+    def __len__(self):
+        return len(self.agents)
+
     def get_executed_paths(self):
         executed_paths = []
         for agent in self.agents:
             executed_paths.append(agent.get_executed_path())
         return executed_paths
+
+    def tolist(self):
+        return self.agents
 
 
 class Map:
@@ -93,8 +105,3 @@ class Map:
         selected_locs = self.unoccupied_inds[selected_inds]
         return selected_locs
 
-
-class Assignment:
-    def __init__(self, task: Task, agent: Agent) -> None:
-        self.task = task
-        self.agent = agent

@@ -1,7 +1,6 @@
 import typing
 
 from multi_agent_path_planning.lifelong_MAPF.datastuctures import (
-    Assignment,
     Map,
     Path,
     AgentSet,
@@ -14,10 +13,7 @@ class BaseMAPFSolver:
     """
 
     def solve_MAPF_instance(
-        self,
-        map: Map,
-        agents: AgentSet,
-        timestep: int,
+        self, map: Map, agents: AgentSet, timestep: int,
     ) -> typing.List[Path]:
         """
         Arguments:
