@@ -28,6 +28,48 @@ This repository consists of the implementation of some multi-agent path-planning
       - [Results](#results-3)
       - [References](#references-1)
 
+## Temporary Instructions for Running
+
+Install poetry by running the following cmd (unix)
+
+`curl -sSL https://install.python-poetry.org | python3 -`
+
+Check install
+
+`poetry --version`
+
+If install isnt sourced, add to bash_rc (ubuntu) or bash_profile (mac), and source. (Clean this up if this is bad practice)
+
+`export PATH=$PATH:$HOME/.local/bin`
+`source ~/.bash_profile`
+
+Navigate to folder which contains _pyproject.toml_ , and run 
+
+`poetry install`
+
+Deactivate any other venvs including conda...
+
+`conda deactivate`
+
+## Running 
+
+Navigate to _lifelongMAPF_ folder, run the file with, 
+
+`cd ./multi_agent_path_planning/lifelong_MAPF`
+`python3 lifelong_MAPF.py input.yaml output.yaml`
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Dependencies
 
 Install the necessary dependencies by running.
