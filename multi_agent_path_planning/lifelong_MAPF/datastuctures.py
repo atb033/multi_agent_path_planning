@@ -12,33 +12,51 @@ class Task:
 
 
 class TaskSet:
-    def __init__(self, task_iterable=()) -> None:
+    """An unordered set of tasks
+    """
+
+    def __init__(self, task_iterable: typing.Iterable = ()) -> None:
+        """An unordered set of tasks
+
+        Args:
+            task_iterable (typing.Iterable, optional): The individual tasks. Defaults to ().
+        """
         self.task_dict = {i: task_iterable[i] for i in range(len(task_iterable))}
         self.next_key = len(task_iterable) + 1
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """The number of tasks
+
+        Returns:
+            int: the number of tasks
+        """
         return len(self.task_dict)
 
-    def add_tasks(self, task_iterable):
+    def add_tasks(self, task_iterable: typing.Iterable[Task]):
+        """Add new tasks to the set
+
+        Args:
+            task_iterable (typing.Iterable[Task]): The tasks
+        """
         new_task_dict = {
             i + self.next_key: task_iterable[i] for i in range(len(task_iterable))
         }
         self.next_key += len(task_iterable)
         self.task_dict.update(new_task_dict)
 
-    def get_tasks(self, keys):
-        tasks = [self.task_dict[k] for k in keys]
-        breakpoint()
-        return tasks
+    def pop_n_random_tasks(self, n_tasks: int) -> typing.List[Task]:
+        """Select, remove, and return n tasks
 
-    def pop_n_random_tasks(self, n_tasks):
+        Args:
+            n_tasks (int): Number to remove
+
+        Returns:
+            typing.List[Task]: The tasks which were popped
+        """
         keys = list(self.task_dict.keys())
         chosen_keys = np.random.choice(keys, size=n_tasks, replace=False)
         tasks = [self.task_dict.pop(k) for k in chosen_keys]
         return tasks
-
-    def get_inds(self):
-        return
 
 
 class PathNode:
@@ -88,6 +106,7 @@ class Agent:
 
     def updater_routine(self):
         pass
+        # TODO
         # updater_routine:
         # update location
         # update full trajceory
