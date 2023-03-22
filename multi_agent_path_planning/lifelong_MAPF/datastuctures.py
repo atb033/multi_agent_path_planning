@@ -11,6 +11,36 @@ class Task:
         self.timestep = timestep
 
 
+class TaskSet:
+    def __init__(self, task_iterable=()) -> None:
+        self.task_dict = {i: task_iterable[i] for i in range(len(task_iterable))}
+        self.next_key = len(task_iterable) + 1
+
+    def __len__(self):
+        return len(self.task_dict)
+
+    def add_tasks(self, task_iterable):
+        new_task_dict = {
+            i + self.next_key: task_iterable[i] for i in range(len(task_iterable))
+        }
+        self.next_key += len(task_iterable)
+        self.task_dict.update(new_task_dict)
+
+    def get_tasks(self, keys):
+        tasks = [self.task_dict[k] for k in keys]
+        breakpoint()
+        return tasks
+
+    def pop_n_random_tasks(self, n_tasks):
+        keys = list(self.task_dict.keys())
+        chosen_keys = np.random.choice(keys, size=n_tasks, replace=False)
+        tasks = [self.task_dict.pop(k) for k in chosen_keys]
+        return tasks
+
+    def get_inds(self):
+        return
+
+
 class PathNode:
     def __init__(self, loc, timestep):
         self.loc = loc
@@ -78,6 +108,13 @@ class AgentSet:
 
     def tolist(self):
         return self.agents
+
+    def get_unallocated_agents(self):
+        return AgentSet([agent for agent in self.agents if not agent.is_allocated()])
+
+    def get_n_random_agents(self, n_agents):
+        sampled_agents = np.random.choice(self.agents, size=n_agents).tolist()
+        return sampled_agents
 
 
 class Map:

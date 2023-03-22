@@ -1,7 +1,7 @@
 import argparse
 import typing
 
-from multi_agent_path_planning.lifelong_MAPF.datastuctures import Agent, Map
+from multi_agent_path_planning.lifelong_MAPF.datastuctures import Agent, Map, TaskSet
 from multi_agent_path_planning.lifelong_MAPF.dynamics_simulator import (
     BaseDynamicsSimulator,
 )
@@ -59,7 +59,7 @@ def lifelong_MAPF_experiment(
     """
     # The set of tasks which need to be exected
     # It should be a List[Task]
-    open_tasks = []
+    open_tasks = TaskSet()
 
     # TODO: fix comment
     # This is the set of agents which are ready to accept a new task assignment
@@ -73,7 +73,7 @@ def lifelong_MAPF_experiment(
         # Ask the task factory for new task
         new_tasks, no_new_tasks = task_factory.produce_tasks(timestep=timestep)
         # Add them to the existing list
-        open_tasks.extend(new_tasks)
+        open_tasks.add_tasks(new_tasks)
 
         # If there are no current tasks and the factory says there won't be any more
         # and all the agents are at the goal, break
