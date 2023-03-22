@@ -76,21 +76,25 @@ class Agent:
         self.n_completed_task = 0
         self.idle_timesteps = 0
 
-    # updater_routine:
-    # update location
-    # update full trajceory
-    # if loc == goal
-    # if task[1] == loc
-    #   make goal and task null
-    # method to take desired path and update the location
     def set_task(self, task: Task):
         self.task = task
+        self.goal = self.task.start
 
     def get_executed_path(self):
         return self.executed_path
 
     def is_allocated(self):
         return self.goal is not None
+
+    def updater_routine(self):
+        pass
+        # updater_routine:
+        # update location
+        # update full trajceory
+        # if loc == goal
+        # if task[1] == loc
+        #   make goal and task null
+        # method to take desired path and update the location
 
 
 class AgentSet:
