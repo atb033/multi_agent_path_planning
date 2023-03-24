@@ -11,6 +11,54 @@ class Task:
         self.timestep = timestep
 
 
+class TaskSet:
+    """An unordered set of tasks
+    """
+
+    def __init__(self, task_iterable: typing.Iterable = ()) -> None:
+        """An unordered set of tasks
+
+        Args:
+            task_iterable (typing.Iterable, optional): The individual tasks. Defaults to ().
+        """
+        self.task_dict = {i: task_iterable[i] for i in range(len(task_iterable))}
+        self.next_key = len(task_iterable) + 1
+
+    def __len__(self) -> int:
+        """The number of tasks
+
+        Returns:
+            int: the number of tasks
+        """
+        return len(self.task_dict)
+
+    def add_tasks(self, task_iterable: typing.Iterable[Task]):
+        """Add new tasks to the set
+
+        Args:
+            task_iterable (typing.Iterable[Task]): The tasks
+        """
+        new_task_dict = {
+            i + self.next_key: task_iterable[i] for i in range(len(task_iterable))
+        }
+        self.next_key += len(task_iterable)
+        self.task_dict.update(new_task_dict)
+
+    def pop_n_random_tasks(self, n_tasks: int) -> typing.List[Task]:
+        """Select, remove, and return n tasks
+
+        Args:
+            n_tasks (int): Number to remove
+
+        Returns:
+            typing.List[Task]: The tasks which were popped
+        """
+        keys = list(self.task_dict.keys())
+        chosen_keys = np.random.choice(keys, size=n_tasks, replace=False)
+        tasks = [self.task_dict.pop(k) for k in chosen_keys]
+        return tasks
+
+
 class PathNode:
     def __init__(self, loc, timestep):
         self.loc = loc
@@ -46,26 +94,50 @@ class Agent:
         self.n_completed_task = 0
         self.idle_timesteps = 0
 
-    # updater_routine:
-    # update location
-    # update full trajceory
-    # if loc == goal
-    # if task[1] == loc
-    #   make goal and task null
-    # method to take desired path and update the location
+    def set_task(self, task: Task):
+        self.task = task
+        self.goal = self.task.start
+
     def get_executed_path(self):
         return self.executed_path
+
+    def is_allocated(self):
+        return self.goal is not None
+
+    def updater_routine(self):
+        pass
+        # TODO
+        # updater_routine:
+        # update location
+        # update full trajceory
+        # if loc == goal
+        # if task[1] == loc
+        #   make goal and task null
+        # method to take desired path and update the location
 
 
 class AgentSet:
     def __init__(self, agents: typing.List[Agent]):
         self.agents = agents
 
+    def __len__(self):
+        return len(self.agents)
+
     def get_executed_paths(self):
         executed_paths = []
         for agent in self.agents:
             executed_paths.append(agent.get_executed_path())
         return executed_paths
+
+    def tolist(self):
+        return self.agents
+
+    def get_unallocated_agents(self):
+        return AgentSet([agent for agent in self.agents if not agent.is_allocated()])
+
+    def get_n_random_agents(self, n_agents):
+        sampled_agents = np.random.choice(self.agents, size=n_agents).tolist()
+        return sampled_agents
 
 
 class Map:
@@ -93,8 +165,3 @@ class Map:
         selected_locs = self.unoccupied_inds[selected_inds]
         return selected_locs
 
-
-class Assignment:
-    def __init__(self, task: Task, agent: Agent) -> None:
-        self.task = task
-        self.agent = agent

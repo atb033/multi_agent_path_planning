@@ -1,10 +1,7 @@
 import typing
+import numpy as np
 
-from multi_agent_path_planning.lifelong_MAPF.datastuctures import (
-    AgentSet,
-    Assignment,
-    Task,
-)
+from multi_agent_path_planning.lifelong_MAPF.datastuctures import AgentSet, TaskSet
 
 
 class BaseTaskAllocator:
@@ -12,9 +9,7 @@ class BaseTaskAllocator:
     Def
     """
 
-    def allocate_tasks(
-        self, tasks: typing.List[Task], agents: AgentSet
-    ) -> typing.List[Assignment]:
+    def allocate_tasks(self, tasks: TaskSet, agents: AgentSet) -> AgentSet:
         """
         Arguments:
             tasks: The open tasks
@@ -23,4 +18,32 @@ class BaseTaskAllocator:
         Returns:
             Agents updated with assignments
         """
+        return agents
+
+
+class RandomTaskAllocator:
+    def allocate_tasks(self, tasks: TaskSet, agents: AgentSet) -> AgentSet:
+        """Randomly match task with available robots
+
+        Args:
+            tasks (typing.List[Task]): The list of tasks which are open
+            agents (AgentSet): The agents which may or may not be free to recive the task
+
+        Returns:
+            AgentSet: The agents are updated with their new task
+        """
+        # Parse which agents are not tasked yet
+        untasked_agents = agents.get_unallocated_agents()
+
+        # Sample the tasks to be assigned this timestep
+        sampled_tasks = tasks.pop_n_random_tasks(min(len(untasked_agents), len(tasks)))
+
+        # Sample the agents to associate with
+        sampled_agents = untasked_agents.get_n_random_agents(len(sampled_tasks))
+
+        # Assign each agent a task
+        for agent, task in zip(sampled_agents, sampled_tasks):
+            agent.set_task(task)
+
+        # Return the agents which were updated by reference
         return agents
