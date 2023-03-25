@@ -72,6 +72,15 @@ class Path:
     def add_pathnode(self, pathnode: PathNode):
         self.pathnodes.append(pathnode)
 
+    def pop_pathnode(self):
+        if len(self.pathnodes) > 0:
+            return self.pathnodes.pop(0)
+        else:
+            print("this shouldn't happen")
+            exit()
+
+
+
 
 class Agent:
     def __init__(
@@ -93,6 +102,7 @@ class Agent:
         self.executed_path = Path()
         self.n_completed_task = 0
         self.idle_timesteps = 0
+        self.timestep = 0
 
     def set_task(self, task: Task):
         self.task = task
@@ -104,16 +114,28 @@ class Agent:
     def is_allocated(self):
         return self.goal is not None
 
-    def updater_routine(self):
-        pass
-        # TODO
-        # updater_routine:
-        # update location
-        # update full trajceory
-        # if loc == goal
-        # if task[1] == loc
-        #   make goal and task null
-        # method to take desired path and update the location
+    def soft_simulation_timestep_update(self):
+        # if the agent has no plan is taskless
+        if self.planned_path is None:
+            self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
+            self.idle_timesteps += 1
+            self.timestep += 1
+            continue
+        # assume that the planner has created a collision free path
+        else:
+            self.loc = self.planned_path.pop_pathnode()
+            self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
+            self.timestep += 1
+            # if path is exausted (goal reached)
+            if len(self.planned_path.pathnodes) == 0:
+                # if we have hit the "start" of a "task"
+                if self.loc == self.task.start:
+                    self.goal = self.task.goal 
+                else:
+                    self.goal = None
+                    self.task = None
+                    self.planned_path = None
+                    self.n_completed_task += 1
 
 
 class AgentSet:

@@ -34,9 +34,11 @@ def main():
         dynamics_simulator=BaseDynamicsSimulator(),
     )
 
+    print(output)
+
     # refine this later
-    with open(args.output, "w") as output_yaml:
-        yaml.safe_dump(output, output_yaml)
+    # with open(args.output, "w") as output_yaml:
+        # yaml.safe_dump(output, output_yaml)
 
 
 def lifelong_MAPF_experiment(
