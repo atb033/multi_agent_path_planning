@@ -42,25 +42,22 @@ class SippSolver:
             planned_paths: The already planned paths
             timestep: The simulation timestep
         """
-        temp_map = make_map_dict_dynamic_obs(map_instance=map_instance, agents=agents, timestep=1)
-        print('maker space')
+        temp_map = make_map_dict_dynamic_obs(map_instance=map_instance, agents=agents, timestep=timestep)
+
         if len(temp_map["agents"]) == 0:
             print('No Agent Replans at Timestep :', timestep)
             return agents
 
         for agent in range(len(temp_map["agents"])):
-
             id_agent = temp_map["agents"][agent]["name"]
             sipp_planner = SippPlanner(temp_map, agent)
 
             if sipp_planner.compute_plan():
-                print('     s')
                 plan = sipp_planner.get_plan()
                 print(plan)
                 temp_map["dynamic_obstacles"].update(plan)
                 # update agent
                 agents.agents[agents.get_agent_from_id(id_agent)].set_planned_path_from_plan(plan)
-                print('             d')
             else:
                 print("Plan not found for agent :", id_agent, " at timestep:", timestep)
 

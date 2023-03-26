@@ -1,7 +1,8 @@
 agents:
 -   name: agent0
     start: [0,0]
-
+-   name: agent1
+    start: [0,1]
 map:
     dimensions: [10, 10]
 

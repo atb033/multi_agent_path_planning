@@ -73,8 +73,10 @@ def lifelong_MAPF_experiment(
 
     # Run for a fixed number of timesteps
     for timestep in range(max_timesteps):
+
         # Ask the task factory for new task
         new_tasks, no_new_tasks = task_factory.produce_tasks(timestep=timestep)
+
         # Add them to the existing list
         open_tasks.add_tasks(new_tasks)
         print('     ')

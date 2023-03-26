@@ -61,6 +61,7 @@ class TaskSet:
 
 class PathNode:
     def __init__(self, loc, timestep):
+        print('New Path Node with Location:', loc," Time: ",timestep)
         self.loc = loc
         self.timestep = timestep
     def get_loc(self):
@@ -76,14 +77,28 @@ class Path:
         return self.pathnodes
 
     def add_pathnode(self, pathnode: PathNode):
+        print('path node added ', len(self.pathnodes))
         self.pathnodes.append(pathnode)
 
-    # TODO make sure this actually pops
     def pop_pathnode(self):
         if len(self.pathnodes) > 0:
-            return self.pathnodes.pop(0)
+            print('')
+            print('')
+
+
+            print(len(self.pathnodes))
+            temp = self.pathnodes.pop(0)
+            print(len(self.pathnodes))
+            print(temp.loc)
+            print(temp.timestep)
+
+            print('')
+            print('')
+
+
+            return temp
         else:
-            print("this shouldn't happen")
+            print("Popped from empty Path")
             exit()
 
 
@@ -122,20 +137,7 @@ class Agent:
         return self.planned_path
 
     def set_task(self, task: Task):
-        
-        print("asdf;alskdfja;lskdfj;alskdjf;alksdjf;laksdjfl;aksjdf;lakjsdf")
-        print("asdf;alskdfja;lskdfj;alskdjf;alksdjf;laksdjfl;aksjdf;lakjsdf")
-
-        print("LOCARTION",self.loc)
-
-        print('TAKS', task.start)
-
         self.task = task
-
-        
-
-        # if (self.loc == task.start):
-        #     print('ouchie----------------------------')
         self.goal = self.task.start
 
     def get_executed_path(self):
@@ -145,24 +147,30 @@ class Agent:
         return self.goal is not None
 
     def set_planned_path_from_plan(self, plan):
-
-        print("             PLAN            ",plan)
         temp_path = Path()
-        for node in plan[self.ID][1:]:
+        for node in plan[self.ID]:
+
             temp_loc = [node["x"],node["y"]]
+            
             temp_time = self.timestep + node["t"]
-            temp_node = PathNode(temp_loc,temp_time)
-            temp_path.add_pathnode(temp_node)
+            
+            temp_path.add_pathnode(PathNode(temp_loc,temp_time))
+
         self.planned_path = temp_path
 
     def soft_simulation_timestep_update(self):
         # if the agent has no plan is taskless
         if self.planned_path is None:
+            print('agent stationary')
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
-            self.idle_timesteps += 1
             self.timestep += 1
+            self.idle_timesteps += 1
         else:
+            print('agent on the move')
+            print(self.loc)
             self.loc = self.planned_path.pop_pathnode()
+            print(self.loc)
+            print(self.timestep)
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             # if path is exausted (goal reached)

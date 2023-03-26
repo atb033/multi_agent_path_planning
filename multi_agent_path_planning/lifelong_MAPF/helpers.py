@@ -30,11 +30,9 @@ def make_map_dict_dynamic_obs(map_instance: Map, agents: AgentSet, timestep: int
     dynamic_obstacles_dict = {}
     n_buffer = 100
 
-    print('a')
     # make the map: this is the dimension and static obstacles 
     map_style_map.update(map_instance.get_map_dict())
     yaml_style_map["map"] = map_style_map
-    print(' b')
 
     # make the agents: this are the agents which need planning 
     for agent in agents.tolist():
@@ -52,18 +50,21 @@ def make_map_dict_dynamic_obs(map_instance: Map, agents: AgentSet, timestep: int
     for agent in agents.tolist():
         # for agents that are in motion
         if (type(agent.get_planned_path()) != type(None)):
-            print("agent path needs planning around")
+            print('Agent :', agent.get_id(), 'needs planning around!')
             temp_list = []
             # make dynamic obstacles
             print(len(agent.get_planned_path().get_path()))
-            for path_node in agent.get_planned_path().get_path()[1:]:
+            for path_node in agent.get_planned_path().get_path():
 
-                print(path_node)
+                print(path_node.get_loc(),path_node.get_time())
 
 
                 temp_dict = {}
                 loc = path_node.get_loc()
+                print("Path node time ----- ", path_node.get_time())
+                print('Its Timestep', timestep)
                 time = int(path_node.get_time()-timestep)
+                print("Time diff setter for local planning",time)
                 temp_dict['x'] = loc[0] # TODO: verify that its [x,y]
                 temp_dict['y'] = loc[1] # TODO: verify that its [x,y]
                 temp_dict['t'] = time
@@ -78,6 +79,7 @@ def make_map_dict_dynamic_obs(map_instance: Map, agents: AgentSet, timestep: int
                 temp_list.append(temp_dict)            
             dynamic_obstacles_dict[agent.get_id()] = temp_list
 
+        # for stationary agents
         else: 
             # make non-moving dynamic obstacle from agent last pose
             temp_list = []
