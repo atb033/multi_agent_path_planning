@@ -63,23 +63,28 @@ class PathNode:
     def __init__(self, loc, timestep):
         self.loc = loc
         self.timestep = timestep
-
+    def get_loc(self):
+        return self.loc
+    def get_time(self):
+        return self.timestep
 
 class Path:
     def __init__(self, initial_pathnodes=[]):
         self.pathnodes = initial_pathnodes
 
+    def get_path(self):
+        return self.pathnodes
+
     def add_pathnode(self, pathnode: PathNode):
         self.pathnodes.append(pathnode)
 
+    # TODO make sure this actually pops
     def pop_pathnode(self):
         if len(self.pathnodes) > 0:
             return self.pathnodes.pop(0)
         else:
             print("this shouldn't happen")
             exit()
-
-
 
 
 class Agent:
@@ -104,6 +109,18 @@ class Agent:
         self.idle_timesteps = 0
         self.timestep = 0
 
+    def get_id(self):
+        return self.ID
+
+    def get_loc(self):
+        return self.loc
+
+    def get_goal(self):
+        return self.goal
+
+    def get_planned_path(self):
+        return self.planned_path
+
     def set_task(self, task: Task):
         self.task = task
         self.goal = self.task.start
@@ -114,13 +131,16 @@ class Agent:
     def is_allocated(self):
         return self.goal is not None
 
+    def set_planned_path_from_plan(self, plan):
+        self.planned_path = plan
+
     def soft_simulation_timestep_update(self):
         # if the agent has no plan is taskless
         if self.planned_path is None:
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.idle_timesteps += 1
             self.timestep += 1
-            continue
+            # continue
         # assume that the planner has created a collision free path
         else:
             self.loc = self.planned_path.pop_pathnode()
@@ -176,6 +196,9 @@ class Map:
         if vis:
             plt.imshow(self.map_np)
             plt.show()
+
+    def get_map_dict(self):
+        return self.map_dict
 
     def check_ocupied(self, loc):
         return self.map_np[loc[0], loc[1]]

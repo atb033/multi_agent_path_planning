@@ -6,7 +6,7 @@ from multi_agent_path_planning.lifelong_MAPF.dynamics_simulator import (
     BaseDynamicsSimulator,
 )
 from multi_agent_path_planning.lifelong_MAPF.helpers import *
-from multi_agent_path_planning.lifelong_MAPF.mapf_solver import BaseMAPFSolver
+from multi_agent_path_planning.lifelong_MAPF.mapf_solver import (BaseMAPFSolver, SippSolver,)
 from multi_agent_path_planning.lifelong_MAPF.task_allocator import (
     BaseTaskAllocator,
     RandomTaskAllocator,
@@ -23,6 +23,8 @@ def main():
     parser.add_argument("output", help="output file with the schedule")
     args = parser.parse_args()
 
+    print(args.input)
+
     world_map = Map(args.input)
 
     output = lifelong_MAPF_experiment(
@@ -30,7 +32,7 @@ def main():
         initial_agents=make_agent_set(args.input),
         task_factory=RandomTaskFactory(world_map),
         task_allocator=RandomTaskAllocator(),
-        mapf_solver=BaseMAPFSolver(),
+        mapf_solver=SippSolver(),
         dynamics_simulator=BaseDynamicsSimulator(),
     )
 
@@ -48,7 +50,7 @@ def lifelong_MAPF_experiment(
     task_allocator: BaseTaskAllocator,
     mapf_solver: BaseMAPFSolver,
     dynamics_simulator: BaseDynamicsSimulator,
-    max_timesteps: int = 100,
+    max_timesteps: int = 10,
 ):
     """
     Arguments:
@@ -63,8 +65,7 @@ def lifelong_MAPF_experiment(
     # It should be a List[Task]
     open_tasks = TaskSet()
 
-    # TODO: fix comment
-    # This is the set of agents which are ready to accept a new task assignment
+    # This is all agents
     agents = initial_agents
 
     # Agents are not all at their goals
@@ -77,6 +78,8 @@ def lifelong_MAPF_experiment(
         # Add them to the existing list
         open_tasks.add_tasks(new_tasks)
 
+        print("Number of Open Tasks: ",open_tasks.__len__())
+
         # If there are no current tasks and the factory says there won't be any more
         # and all the agents are at the goal, break
         if len(open_tasks) == 0 and no_new_tasks and agents_at_goals:
@@ -88,7 +91,7 @@ def lifelong_MAPF_experiment(
         # Plan all the required paths. This can both be to get the agents to the starts of tasks
         # or get from their current location to the goal
         agents = mapf_solver.solve_MAPF_instance(
-            map=map_instance, agents=agents, timestep=timestep,
+            map_instance=map_instance, agents=agents, timestep=timestep,
         )
 
         # Step the simulation one step and record the paths
