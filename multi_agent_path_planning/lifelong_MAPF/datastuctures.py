@@ -12,8 +12,7 @@ class Task:
 
 
 class TaskSet:
-    """An unordered set of tasks
-    """
+    """An unordered set of tasks"""
 
     def __init__(self, task_iterable: typing.Iterable = ()) -> None:
         """An unordered set of tasks
@@ -64,10 +63,13 @@ class PathNode:
         # print('New Path Node with Location:', loc," Time: ",timestep)
         self.loc = loc
         self.timestep = timestep
+
     def get_loc(self):
         return self.loc
+
     def get_time(self):
         return self.timestep
+
 
 class Path:
     def __init__(self, initial_pathnodes=[]):
@@ -98,7 +100,11 @@ class Path:
 
 class Agent:
     def __init__(
-        self, loc, ID, goal=None, task: Task = None,
+        self,
+        loc,
+        ID,
+        goal=None,
+        task: Task = None,
     ):
         """_summary_
 
@@ -141,34 +147,38 @@ class Agent:
         return self.goal is not None
 
     def set_planned_path_from_plan(self, plan):
+        print("Updating plan by adding nodes",self.ID)
         temp_path = Path()
-        for node in plan[self.ID]:
-            temp_loc = [node["x"],node["y"]]
-            temp_time = self.timestep + node["t"]
-            temp_path.add_pathnode(PathNode(temp_loc,temp_time))
+        for node in plan[self.ID][1:]:
+            temp_loc = [node["x"], node["y"]]
+            temp_time = node["t"]
+
+            print(' adding node', temp_loc,temp_time)
+            temp_path.add_pathnode(PathNode(temp_loc, temp_time))
 
         self.planned_path = temp_path
 
     def soft_simulation_timestep_update(self):
         # if the agent has no plan is taskless
+        print('Dynamics for agent ', self.ID)
         if self.planned_path is None:
-            print('Agent stationary')
+            print("     Agent stationary")
+            print('     current loc', self.loc)
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             self.idle_timesteps += 1
         else:
-            print('Agent on the move')
-            # print(self.loc)
+            print("     Agent on the move")
+            print('     current loc', self.loc)
             self.loc = self.planned_path.pop_pathnode().get_loc()
-            # print(self.loc)
-            # print(self.timestep)
+            print('     next loc', self.loc)
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             # if path is exausted (goal reached)
             if len(self.planned_path.pathnodes) == 0:
                 # if we have hit the "start" of a "task"
                 if self.loc == self.task.start:
-                    self.goal = self.task.goal 
+                    self.goal = self.task.goal
                 else:
                     self.goal = None
                     self.task = None
@@ -192,14 +202,14 @@ class AgentSet:
 
             for path_node in agent.get_executed_path().get_path():
                 temp = {}
-                temp['x'] = path_node.get_loc()[0]
-                temp['y'] = path_node.get_loc()[1]
-                temp['t'] = path_node.get_time()
+                temp["x"] = path_node.get_loc()[0]
+                temp["y"] = path_node.get_loc()[1]
+                temp["t"] = path_node.get_time()
                 temp_list.append(temp)
             schedule[temp_id] = temp_list
 
         output = {}
-        output['schedule'] = schedule
+        output["schedule"] = schedule
 
         return output
 
@@ -218,7 +228,7 @@ class AgentSet:
         for index, agent in enumerate(self.agents):
             if agent.get_id() == search_id:
                 return index
-        print('agent ID does not exist in agent list')
+        print("agent ID does not exist in agent list")
         return False
 
 
@@ -249,4 +259,3 @@ class Map:
         )
         selected_locs = self.unoccupied_inds[selected_inds]
         return selected_locs
-

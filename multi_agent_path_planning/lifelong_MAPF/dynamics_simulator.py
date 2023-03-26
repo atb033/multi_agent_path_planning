@@ -20,11 +20,10 @@ class BaseDynamicsSimulator:
             agents_at_goals: Are all agents at the goals
         """
 
-        print('Agent Simulation Step')
+        print("Agent Simulation Step")
 
         for agent_index in range(agents.__len__()):
-            print('Updating Agent: ', agents.agents[agent_index].get_id())
+            print("Updating Agent: ", agents.agents[agent_index].get_id())
             agents.agents[agent_index].soft_simulation_timestep_update()
 
         return agents, False
-

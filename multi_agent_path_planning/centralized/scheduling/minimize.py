@@ -26,7 +26,6 @@ class OptimizationClass:
         )
 
     def optimize(self):
-
         (A_in, b_in) = self.get_inequality_constraints()
         (A_equ, b_equ) = self.get_equality_constraints()
         c = self.get_cost_matrix()

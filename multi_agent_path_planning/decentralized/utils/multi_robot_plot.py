@@ -67,7 +67,9 @@ def plot_robot(robot, timestep, radius=1, is_obstacle=False):
     if is_obstacle:
         circle = plt.Circle((x, y), radius, color="aqua", ec="black")
         plt.plot(
-            robot[0, :timestep], robot[1, :timestep], "--r",
+            robot[0, :timestep],
+            robot[1, :timestep],
+            "--r",
         )
     else:
         circle = plt.Circle((x, y), radius, color="green", ec="black")
