@@ -47,16 +47,17 @@ Navigate to folder which contains _pyproject.toml_ , and run
 
 `poetry install`
 
+`poetry shell`
+
 Deactivate any other venvs including conda...
 
 `conda deactivate`
 
 ## Running 
 
-Navigate to _lifelongMAPF_ folder, run the file with, 
+Run with the following, 
 
-`cd ./multi_agent_path_planning/lifelong_MAPF`
-`python3 lifelong_MAPF.py input.yaml output.yaml`
+`sh scripts/lifelong_MAPF.sh`
 
 
 
