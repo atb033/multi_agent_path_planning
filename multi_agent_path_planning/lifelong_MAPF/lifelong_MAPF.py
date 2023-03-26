@@ -36,11 +36,10 @@ def main():
         dynamics_simulator=BaseDynamicsSimulator(),
     )
 
-    print(output)
+    with open(args.output, "w") as output_yaml:
+        yaml.safe_dump(output, output_yaml)
 
-    # refine this later
-    # with open(args.output, "w") as output_yaml:
-        # yaml.safe_dump(output, output_yaml)
+    print("the end")
 
 
 def lifelong_MAPF_experiment(
@@ -50,7 +49,7 @@ def lifelong_MAPF_experiment(
     task_allocator: BaseTaskAllocator,
     mapf_solver: BaseMAPFSolver,
     dynamics_simulator: BaseDynamicsSimulator,
-    max_timesteps: int = 10,
+    max_timesteps: int = 1,
 ):
     """
     Arguments:
@@ -96,14 +95,12 @@ def lifelong_MAPF_experiment(
         agents = mapf_solver.solve_MAPF_instance(
             map_instance=map_instance, agents=agents, timestep=timestep,
         )
-        print('solver worked')
         # Step the simulation one step and record the paths
         (agents, agents_at_goals) = dynamics_simulator.step_world(
             agents=agents, timestep=timestep,
         )
 
-    executed_paths = agents.get_executed_paths()
-    return executed_paths
+    return agents.get_executed_paths()
 
 
 if __name__ == "__main__":

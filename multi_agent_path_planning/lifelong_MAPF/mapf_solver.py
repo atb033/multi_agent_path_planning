@@ -54,7 +54,7 @@ class SippSolver:
 
             if sipp_planner.compute_plan():
                 plan = sipp_planner.get_plan()
-                print(plan)
+                print("     Plan for agent: ",id_agent,plan)
                 temp_map["dynamic_obstacles"].update(plan)
                 # update agent
                 agents.agents[agents.get_agent_from_id(id_agent)].set_planned_path_from_plan(plan)

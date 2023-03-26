@@ -47,7 +47,7 @@ class RandomTaskAllocator:
                 print("Agent :",agent.get_id()," has been allocated a task!")
                 agent.set_task(task)
             else:
-                print('ERROR                         Agent sitting on goal')
+                print('Agent sitting on goal, moving on...')
 
         # Return the agents which were updated by reference
         return agents

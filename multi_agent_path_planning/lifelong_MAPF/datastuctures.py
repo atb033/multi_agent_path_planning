@@ -61,7 +61,7 @@ class TaskSet:
 
 class PathNode:
     def __init__(self, loc, timestep):
-        print('New Path Node with Location:', loc," Time: ",timestep)
+        # print('New Path Node with Location:', loc," Time: ",timestep)
         self.loc = loc
         self.timestep = timestep
     def get_loc(self):
@@ -77,25 +77,19 @@ class Path:
         return self.pathnodes
 
     def add_pathnode(self, pathnode: PathNode):
-        print('path node added ', len(self.pathnodes))
+        # print('path node added ', len(self.pathnodes))
         self.pathnodes.append(pathnode)
 
     def pop_pathnode(self):
         if len(self.pathnodes) > 0:
-            print('')
-            print('')
-
-
-            print(len(self.pathnodes))
+            # print('')
+            # TODO: Debug time issue
+            # print("Lenth of path before popping",len(self.pathnodes))
             temp = self.pathnodes.pop(0)
-            print(len(self.pathnodes))
-            print(temp.loc)
-            print(temp.timestep)
-
-            print('')
-            print('')
-
-
+            # print("Lenth of path after popping",len(self.pathnodes))
+            # print("Location of popped path node",temp.loc)
+            # print("World time of popped path node",temp.timestep)
+            # print('')
             return temp
         else:
             print("Popped from empty Path")
@@ -149,11 +143,8 @@ class Agent:
     def set_planned_path_from_plan(self, plan):
         temp_path = Path()
         for node in plan[self.ID]:
-
             temp_loc = [node["x"],node["y"]]
-            
             temp_time = self.timestep + node["t"]
-            
             temp_path.add_pathnode(PathNode(temp_loc,temp_time))
 
         self.planned_path = temp_path
@@ -161,16 +152,16 @@ class Agent:
     def soft_simulation_timestep_update(self):
         # if the agent has no plan is taskless
         if self.planned_path is None:
-            print('agent stationary')
+            print('Agent stationary')
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             self.idle_timesteps += 1
         else:
-            print('agent on the move')
-            print(self.loc)
-            self.loc = self.planned_path.pop_pathnode()
-            print(self.loc)
-            print(self.timestep)
+            print('Agent on the move')
+            # print(self.loc)
+            self.loc = self.planned_path.pop_pathnode().get_loc()
+            # print(self.loc)
+            # print(self.timestep)
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             # if path is exausted (goal reached)
@@ -193,10 +184,24 @@ class AgentSet:
         return len(self.agents)
 
     def get_executed_paths(self):
-        executed_paths = []
+        schedule = {}
+
         for agent in self.agents:
-            executed_paths.append(agent.get_executed_path())
-        return executed_paths
+            temp_id = agent.get_id()
+            temp_list = []
+
+            for path_node in agent.get_executed_path().get_path():
+                temp = {}
+                temp['x'] = path_node.get_loc()[0]
+                temp['y'] = path_node.get_loc()[1]
+                temp['t'] = path_node.get_time()
+                temp_list.append(temp)
+            schedule[temp_id] = temp_list
+
+        output = {}
+        output['schedule'] = schedule
+
+        return output
 
     def tolist(self):
         return self.agents

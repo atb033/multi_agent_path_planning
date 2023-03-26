@@ -1,0 +1,15 @@
+schedule:
+  agent0:
+  - t: 0
+    x: 0
+    y: 0
+  - t: 0
+    x: 4
+    y: 4
+  agent1:
+  - t: 0
+    x: 0
+    y: 0
+  - t: 0
+    x: 4
+    y: 4
