@@ -19,4 +19,9 @@ class BaseDynamicsSimulator:
             agents: the agents updated
             agents_at_goals: Are all agents at the goals
         """
+
+        for agent_index in range(agents.__len__()):
+            agents.agents[agent_index].soft_simulation_timestep_update()
+
         return agents, False
+

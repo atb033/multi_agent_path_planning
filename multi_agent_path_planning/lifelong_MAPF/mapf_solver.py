@@ -6,6 +6,7 @@ from multi_agent_path_planning.lifelong_MAPF.datastuctures import (
     AgentSet,
 )
 
+from multi_agent_path_planning.centralized.sipp.graph_generation import SippGraph, State
 from multi_agent_path_planning.centralized.sipp.sipp import SippPlanner
 from multi_agent_path_planning.lifelong_MAPF.helpers import make_map_dict_dynamic_obs
 
@@ -41,30 +42,25 @@ class SippSolver:
             planned_paths: The already planned paths
             timestep: The simulation timestep
         """
-        # TODO: finish this function 
         temp_map = make_map_dict_dynamic_obs(map_instance=map_instance, agents=agents, timestep=1)
-
-        if not temp_map.__contains__("agents"):
-
+        print('maker space')
+        if len(temp_map["agents"]) == 0:
             print('No Agent Replans at Timestep :', timestep)
-
             return agents
 
-        for agent in temp_map["agents"]:
+        for agent in range(len(temp_map["agents"])):
 
-            id_agent = agent["name"]
-
-            sipp_planner = SippPlanner(temp_map, id_agent)
+            id_agent = temp_map["agents"][agent]["name"]
+            sipp_planner = SippPlanner(temp_map, agent)
 
             if sipp_planner.compute_plan():
-
+                print('     s')
                 plan = sipp_planner.get_plan()
-
+                print(plan)
                 temp_map["dynamic_obstacles"].update(plan)
-        
-                # TODO: finish this function 
-                agent.set_planned_path_from_plan(plan)
-
+                # update agent
+                agents.agents[agents.get_agent_from_id(id_agent)].set_planned_path_from_plan(plan)
+                print('             d')
             else:
                 print("Plan not found for agent :", id_agent, " at timestep:", timestep)
 

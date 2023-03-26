@@ -52,6 +52,7 @@ class RandomTaskFactory:
         task_list = []
         for _ in range(self.tasks_per_timestep):
             start, goal = self.world_map.get_random_unoccupied_loc(2)
+            print("New Task Start: ",start,"New Task Goal: ",goal)
             new_task = Task(start=start, goal=goal, timestep=timestep)
             task_list.append(new_task)
 

@@ -77,23 +77,24 @@ def lifelong_MAPF_experiment(
         new_tasks, no_new_tasks = task_factory.produce_tasks(timestep=timestep)
         # Add them to the existing list
         open_tasks.add_tasks(new_tasks)
-
+        print('     ')
+        print('Timestep: ', timestep)
         print("Number of Open Tasks: ",open_tasks.__len__())
 
         # If there are no current tasks and the factory says there won't be any more
         # and all the agents are at the goal, break
         if len(open_tasks) == 0 and no_new_tasks and agents_at_goals:
+            print('Jobs Done')
             break
 
         # Assign the open tasks to the open agents
         agents = task_allocator.allocate_tasks(open_tasks, agents)
-
         # Plan all the required paths. This can both be to get the agents to the starts of tasks
         # or get from their current location to the goal
         agents = mapf_solver.solve_MAPF_instance(
             map_instance=map_instance, agents=agents, timestep=timestep,
         )
-
+        print('solver worked')
         # Step the simulation one step and record the paths
         (agents, agents_at_goals) = dynamics_simulator.step_world(
             agents=agents, timestep=timestep,

@@ -122,7 +122,20 @@ class Agent:
         return self.planned_path
 
     def set_task(self, task: Task):
+        
+        print("asdf;alskdfja;lskdfj;alskdjf;alksdjf;laksdjfl;aksjdf;lakjsdf")
+        print("asdf;alskdfja;lskdfj;alskdjf;alksdjf;laksdjfl;aksjdf;lakjsdf")
+
+        print("LOCARTION",self.loc)
+
+        print('TAKS', task.start)
+
         self.task = task
+
+        
+
+        # if (self.loc == task.start):
+        #     print('ouchie----------------------------')
         self.goal = self.task.start
 
     def get_executed_path(self):
@@ -132,7 +145,15 @@ class Agent:
         return self.goal is not None
 
     def set_planned_path_from_plan(self, plan):
-        self.planned_path = plan
+
+        print("             PLAN            ",plan)
+        temp_path = Path()
+        for node in plan[self.ID][1:]:
+            temp_loc = [node["x"],node["y"]]
+            temp_time = self.timestep + node["t"]
+            temp_node = PathNode(temp_loc,temp_time)
+            temp_path.add_pathnode(temp_node)
+        self.planned_path = temp_path
 
     def soft_simulation_timestep_update(self):
         # if the agent has no plan is taskless
@@ -140,8 +161,6 @@ class Agent:
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.idle_timesteps += 1
             self.timestep += 1
-            # continue
-        # assume that the planner has created a collision free path
         else:
             self.loc = self.planned_path.pop_pathnode()
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
@@ -180,6 +199,14 @@ class AgentSet:
     def get_n_random_agents(self, n_agents):
         sampled_agents = np.random.choice(self.agents, size=n_agents).tolist()
         return sampled_agents
+
+    def get_agent_from_id(self, search_id):
+        # search for agent by self.ID
+        for index, agent in enumerate(self.agents):
+            if agent.get_id() == search_id:
+                return index
+        print('agent ID does not exist in agent list')
+        return False
 
 
 class Map:

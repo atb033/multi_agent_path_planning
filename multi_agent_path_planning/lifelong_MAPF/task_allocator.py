@@ -43,7 +43,11 @@ class RandomTaskAllocator:
 
         # Assign each agent a task
         for agent, task in zip(sampled_agents, sampled_tasks):
-            agent.set_task(task)
+            if agent.get_loc()[0] != task.start[0] and agent.get_loc()[1] != task.start[1]:
+                print("Agent :",agent.get_id()," has been allocated a task!")
+                agent.set_task(task)
+            else:
+                print('ERROR                         Agent sitting on goal')
 
         # Return the agents which were updated by reference
         return agents
