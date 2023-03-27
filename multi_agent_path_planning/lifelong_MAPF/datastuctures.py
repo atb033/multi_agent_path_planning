@@ -4,10 +4,51 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+class Location:
+    def __init__(self, loc):
+        """Reduce ambiguity about i,j vs. x,y convention
+
+        Args:
+            loc (iterable or Location): assumed to be in i,j order
+        """
+        if isinstance(loc, Location):
+            self.ij_loc = loc.ij_loc
+        else:
+            self.ij_loc = tuple(loc)
+
+    def __repr__(self) -> str:
+        return f"loc: i={self.i()}, j={self.j()}"
+
+    @staticmethod
+    def from_xy(xy_loc):
+        return Location((xy_loc[1], xy_loc[0]))
+
+    def as_ij(self):
+        return (self.i(), self.j())
+
+    def as_xy(self):
+        return (self.x(), self.y())
+
+    def __eq__(self, __value: object) -> bool:
+        return self.ij_loc == __value.ij_loc
+
+    def x(self):
+        return self.ij_loc[1]
+
+    def y(self):
+        return self.ij_loc[0]
+
+    def i(self):
+        return self.ij_loc[0]
+
+    def j(self):
+        return self.ij_loc[1]
+
+
 class Task:
     def __init__(self, start, goal, timestep):
-        self.start = start
-        self.goal = goal
+        self.start = Location(start)
+        self.goal = Location(goal)
         self.timestep = timestep
 
 
@@ -61,10 +102,10 @@ class TaskSet:
 class PathNode:
     def __init__(self, loc, timestep):
         # print('New Path Node with Location:', loc," Time: ",timestep)
-        self.loc = loc
+        self.loc = Location(loc)
         self.timestep = timestep
 
-    def get_loc(self):
+    def get_loc(self) -> Location:
         return self.loc
 
     def get_time(self):
@@ -100,11 +141,7 @@ class Path:
 
 class Agent:
     def __init__(
-        self,
-        loc,
-        ID,
-        goal=None,
-        task: Task = None,
+        self, loc, ID, goal=None, task: Task = None,
     ):
         """_summary_
 
@@ -114,7 +151,7 @@ class Agent:
             goal (_type_, optional): _description_. Defaults to None.
             task (Task, optional): _description_. Defaults to None.
         """
-        self.loc = loc
+        self.loc = Location(loc)
         self.ID = ID
         self.goal = goal
         self.task = task
@@ -127,7 +164,7 @@ class Agent:
     def get_id(self):
         return self.ID
 
-    def get_loc(self):
+    def get_loc(self) -> Location:
         return self.loc
 
     def get_goal(self):
@@ -147,31 +184,31 @@ class Agent:
         return self.goal is not None
 
     def set_planned_path_from_plan(self, plan):
-        print("Updating plan by adding nodes",self.ID)
+        print("Updating plan by adding nodes", self.ID)
         temp_path = Path()
         for node in plan[self.ID][1:]:
-            temp_loc = [node["x"], node["y"]]
+            temp_loc = Location.from_xy((node["x"], node["y"]))
             temp_time = node["t"]
 
-            print(' adding node', temp_loc,temp_time)
+            print(" adding node", temp_loc, temp_time)
             temp_path.add_pathnode(PathNode(temp_loc, temp_time))
 
         self.planned_path = temp_path
 
     def soft_simulation_timestep_update(self):
         # if the agent has no plan is taskless
-        print('Dynamics for agent ', self.ID)
+        print("Dynamics for agent ", self.ID)
         if self.planned_path is None:
             print("     Agent stationary")
-            print('     current loc', self.loc)
+            print("     current loc", self.loc)
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             self.idle_timesteps += 1
         else:
             print("     Agent on the move")
-            print('     current loc', self.loc)
+            print("     current loc", self.loc)
             self.loc = self.planned_path.pop_pathnode().get_loc()
-            print('     next loc', self.loc)
+            print("     next loc", self.loc)
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             # if path is exausted (goal reached)
@@ -202,8 +239,8 @@ class AgentSet:
 
             for path_node in agent.get_executed_path().get_path():
                 temp = {}
-                temp["x"] = path_node.get_loc()[0]
-                temp["y"] = path_node.get_loc()[1]
+                temp["x"] = path_node.get_loc().x()
+                temp["y"] = path_node.get_loc().y()
                 temp["t"] = path_node.get_time()
                 temp_list.append(temp)
             schedule[temp_id] = temp_list
