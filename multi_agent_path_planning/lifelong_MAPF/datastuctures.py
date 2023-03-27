@@ -2,6 +2,7 @@ import yaml
 import typing
 import numpy as np
 import matplotlib.pyplot as plt
+import multi_agent_path_planning
 
 
 class Location:
@@ -11,10 +12,11 @@ class Location:
         Args:
             loc (iterable or Location): assumed to be in i,j order
         """
-        if isinstance(loc, Location):
-            self.ij_loc = loc.ij_loc
-        else:
+        # TODO make this more robust
+        try:
             self.ij_loc = tuple(loc)
+        except TypeError:
+            self.ij_loc = loc.ij_loc
 
     def __repr__(self) -> str:
         return f"loc: i={self.i()}, j={self.j()}"
@@ -287,12 +289,16 @@ class Map:
     def get_map_dict(self):
         return self.map_dict
 
-    def check_ocupied(self, loc):
-        return self.map_np[loc[0], loc[1]]
+    def check_ocupied(self, loc: Location):
+        return self.map_np[loc.i(), loc.j()]
 
-    def get_random_unoccupied_loc(self, n_samples, with_replacement=False):
+    def get_random_unoccupied_locs(
+        self, n_samples, with_replacement=False
+    ) -> typing.List[Location]:
         selected_inds = np.random.choice(
             self.unoccupied_inds.shape[0], n_samples, replace=with_replacement
         )
         selected_locs = self.unoccupied_inds[selected_inds]
+        # Convert to Location datatype
+        selected_locs = [Location(loc) for loc in selected_locs]
         return selected_locs
