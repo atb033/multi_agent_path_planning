@@ -6,9 +6,7 @@ class BaseDynamicsSimulator:
     """ """
 
     def step_world(
-        self,
-        agents: AgentSet,
-        timestep: int,
+        self, agents: AgentSet, timestep: int,
     ):
         """
         Args:
@@ -19,4 +17,10 @@ class BaseDynamicsSimulator:
             agents: the agents updated
             agents_at_goals: Are all agents at the goals
         """
+
+        print("Agent Simulation Step")
+
+        for agent_index in range(len(agents)):
+            print("Updating Agent: ", agents.agents[agent_index].get_id())
+            agents.agents[agent_index].soft_simulation_timestep_update()
         return agents, False

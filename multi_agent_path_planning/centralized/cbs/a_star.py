@@ -23,7 +23,7 @@ class AStar:
 
     def search(self, agent_name):
         """
-        low level search 
+        low level search
         """
         initial_state = self.agent_dict[agent_name]["start"]
         step_cost = 1

@@ -2,18 +2,60 @@ import yaml
 import typing
 import numpy as np
 import matplotlib.pyplot as plt
+import multi_agent_path_planning
+
+
+class Location:
+    def __init__(self, loc):
+        """Reduce ambiguity about i,j vs. x,y convention
+
+        Args:
+            loc (iterable or Location): assumed to be in i,j order
+        """
+        # TODO make this more robust
+        try:
+            self.ij_loc = tuple(loc)
+        except TypeError:
+            self.ij_loc = loc.ij_loc
+
+    def __repr__(self) -> str:
+        return f"loc: i={self.i()}, j={self.j()}"
+
+    @staticmethod
+    def from_xy(xy_loc):
+        return Location((xy_loc[1], xy_loc[0]))
+
+    def as_ij(self):
+        return (self.i(), self.j())
+
+    def as_xy(self):
+        return (self.x(), self.y())
+
+    def __eq__(self, __value: object) -> bool:
+        return self.ij_loc == __value.ij_loc
+
+    def x(self):
+        return self.ij_loc[1]
+
+    def y(self):
+        return self.ij_loc[0]
+
+    def i(self):
+        return self.ij_loc[0]
+
+    def j(self):
+        return self.ij_loc[1]
 
 
 class Task:
     def __init__(self, start, goal, timestep):
-        self.start = start
-        self.goal = goal
+        self.start = Location(start)
+        self.goal = Location(goal)
         self.timestep = timestep
 
 
 class TaskSet:
-    """An unordered set of tasks
-    """
+    """An unordered set of tasks"""
 
     def __init__(self, task_iterable: typing.Iterable = ()) -> None:
         """An unordered set of tasks
@@ -61,16 +103,63 @@ class TaskSet:
 
 class PathNode:
     def __init__(self, loc, timestep):
-        self.loc = loc
+        # print('New Path Node with Location:', loc," Time: ",timestep)
+        self.loc = Location(loc)
         self.timestep = timestep
+
+    def __repr__(self):
+        return f"{self.loc}, t: {self.timestep}"
+
+    def get_loc(self) -> Location:
+        return self.loc
+
+    def get_time(self):
+        return self.timestep
 
 
 class Path:
-    def __init__(self, initial_pathnodes=[]):
-        self.pathnodes = initial_pathnodes
+    def __init__(self, initial_pathnodes=None):
+        """A path class
+
+        Args:
+            initial_pathnodes (_type_, optional): Note that this is defaulted to None
+            because storing an empty list as a default value is dangerous. If you append
+            to it, that will be reflected any other time the default value is used. This is
+            because default mutable values are stored in a global namespace.
+        """
+        if initial_pathnodes == None:
+            self.pathnodes = []
+        else:
+            self.pathnodes = initial_pathnodes
+
+    def __len__(self):
+        return len(self.pathnodes)
+
+    def __repr__(self) -> str:
+        return str([str(x) for x in self.pathnodes])
+
+    def get_path(self):
+        return self.pathnodes
 
     def add_pathnode(self, pathnode: PathNode):
+        # print('path node added ', len(self.pathnodes))
         self.pathnodes.append(pathnode)
+
+    def pop_pathnode(self):
+        if len(self.pathnodes) > 0:
+            # print('')
+            # TODO: Debug time issue
+            # print("Lenth of path before popping",len(self.pathnodes))
+            temp = self.pathnodes.pop(0)
+            # print("Lenth of path after popping",len(self.pathnodes))
+            # print("Location of popped path node",temp.loc)
+            # print("World time of popped path node",temp.timestep)
+            # print('')
+            return temp
+        else:
+            print("Popped from empty Path")
+            breakpoint()
+            exit()
 
 
 class Agent:
@@ -85,7 +174,7 @@ class Agent:
             goal (_type_, optional): _description_. Defaults to None.
             task (Task, optional): _description_. Defaults to None.
         """
-        self.loc = loc
+        self.loc = Location(loc)
         self.ID = ID
         self.goal = goal
         self.task = task
@@ -93,6 +182,19 @@ class Agent:
         self.executed_path = Path()
         self.n_completed_task = 0
         self.idle_timesteps = 0
+        self.timestep = 0
+
+    def get_id(self):
+        return self.ID
+
+    def get_loc(self) -> Location:
+        return self.loc
+
+    def get_goal(self):
+        return self.goal
+
+    def get_planned_path(self):
+        return self.planned_path
 
     def set_task(self, task: Task):
         self.task = task
@@ -104,16 +206,44 @@ class Agent:
     def is_allocated(self):
         return self.goal is not None
 
-    def updater_routine(self):
-        pass
-        # TODO
-        # updater_routine:
-        # update location
-        # update full trajceory
-        # if loc == goal
-        # if task[1] == loc
-        #   make goal and task null
-        # method to take desired path and update the location
+    def set_planned_path_from_plan(self, plan):
+        print("Updating plan by adding nodes", self.ID)
+        temp_path = Path()
+        for node in plan[self.ID][1:]:
+            temp_loc = Location.from_xy((node["x"], node["y"]))
+            temp_time = node["t"]
+
+            print(" adding node", temp_loc, temp_time)
+            temp_path.add_pathnode(PathNode(temp_loc, temp_time))
+
+        self.planned_path = temp_path
+
+    def soft_simulation_timestep_update(self):
+        # if the agent has no plan is taskless
+        print("Dynamics for agent ", self.ID)
+        if self.planned_path is None or len(self.planned_path) == 0:
+            print("     Agent stationary")
+            print("     current loc", self.loc)
+            self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
+            self.timestep += 1
+            self.idle_timesteps += 1
+        else:
+            print("     Agent on the move")
+            print("     current loc", self.loc)
+            self.loc = self.planned_path.pop_pathnode().get_loc()
+            print("     next loc", self.loc)
+            self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
+            self.timestep += 1
+            # if path is exausted (goal reached)
+            if len(self.planned_path.pathnodes) == 0:
+                # if we have hit the "start" of a "task"
+                if self.loc == self.task.start:
+                    self.goal = self.task.goal
+                else:
+                    self.goal = None
+                    self.task = None
+                    self.planned_path = None
+                    self.n_completed_task += 1
 
 
 class AgentSet:
@@ -124,10 +254,24 @@ class AgentSet:
         return len(self.agents)
 
     def get_executed_paths(self):
-        executed_paths = []
+        schedule = {}
+
         for agent in self.agents:
-            executed_paths.append(agent.get_executed_path())
-        return executed_paths
+            temp_id = agent.get_id()
+            temp_list = []
+
+            for path_node in agent.get_executed_path().get_path():
+                temp = {}
+                temp["x"] = path_node.get_loc().x()
+                temp["y"] = path_node.get_loc().y()
+                temp["t"] = path_node.get_time()
+                temp_list.append(temp)
+            schedule[temp_id] = temp_list
+
+        output = {}
+        output["schedule"] = schedule
+
+        return output
 
     def tolist(self):
         return self.agents
@@ -138,6 +282,14 @@ class AgentSet:
     def get_n_random_agents(self, n_agents):
         sampled_agents = np.random.choice(self.agents, size=n_agents).tolist()
         return sampled_agents
+
+    def get_agent_from_id(self, search_id):
+        # search for agent by self.ID
+        for index, agent in enumerate(self.agents):
+            if agent.get_id() == search_id:
+                return index
+        print("agent ID does not exist in agent list")
+        return False
 
 
 class Map:
@@ -155,13 +307,19 @@ class Map:
             plt.imshow(self.map_np)
             plt.show()
 
-    def check_ocupied(self, loc):
-        return self.map_np[loc[0], loc[1]]
+    def get_map_dict(self):
+        return self.map_dict
 
-    def get_random_unoccupied_loc(self, n_samples, with_replacement=False):
+    def check_ocupied(self, loc: Location):
+        return self.map_np[loc.i(), loc.j()]
+
+    def get_random_unoccupied_locs(
+        self, n_samples, with_replacement=False
+    ) -> typing.List[Location]:
         selected_inds = np.random.choice(
             self.unoccupied_inds.shape[0], n_samples, replace=with_replacement
         )
         selected_locs = self.unoccupied_inds[selected_inds]
+        # Convert to Location datatype
+        selected_locs = [Location(loc) for loc in selected_locs]
         return selected_locs
-

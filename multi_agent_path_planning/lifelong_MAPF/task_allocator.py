@@ -43,7 +43,12 @@ class RandomTaskAllocator:
 
         # Assign each agent a task
         for agent, task in zip(sampled_agents, sampled_tasks):
-            agent.set_task(task)
+            # TODO: make this more elegent, we dont want to assign tasks where the agent is on top of the start, unless we rework some of the initilization stuff, it creates issues with the planner which assumes there is a path required
+            if agent.get_loc() != task.start:
+                print("Agent :", agent.get_id(), " has been allocated a task!")
+                agent.set_task(task)
+            else:
+                print("Agent sitting on goal, moving on...")
 
         # Return the agents which were updated by reference
         return agents

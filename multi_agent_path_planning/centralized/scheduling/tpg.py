@@ -53,7 +53,6 @@ class Edge:
 
 class TemporalPlanGraph:
     def __init__(self, schedule):
-
         self.delta = 0.2  # safety distance
 
         self.schedule = schedule
