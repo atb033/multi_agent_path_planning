@@ -55,6 +55,10 @@ def make_map_dict_dynamic_obs(
         elif type(agent.get_planned_path()) != type(None):
             print("Agent :", agent.get_id(), "needs planning around!")
             temp_list = []
+            # TODO is this the correct default if no paths are planned
+            time = agent.timestep
+            loc = agent.get_loc()
+
             # make dynamic obstacles
             for path_node in agent.get_planned_path().get_path():
                 # print(path_node.get_loc(), path_node.get_time())

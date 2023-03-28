@@ -107,6 +107,9 @@ class PathNode:
         self.loc = Location(loc)
         self.timestep = timestep
 
+    def __repr__(self):
+        return f"{self.loc}, t: {self.timestep}"
+
     def get_loc(self) -> Location:
         return self.loc
 
@@ -115,8 +118,25 @@ class PathNode:
 
 
 class Path:
-    def __init__(self, initial_pathnodes=[]):
-        self.pathnodes = initial_pathnodes
+    def __init__(self, initial_pathnodes=None):
+        """A path class
+
+        Args:
+            initial_pathnodes (_type_, optional): Note that this is defaulted to None
+            because storing an empty list as a default value is dangerous. If you append
+            to it, that will be reflected any other time the default value is used. This is
+            because default mutable values are stored in a global namespace.
+        """
+        if initial_pathnodes == None:
+            self.pathnodes = []
+        else:
+            self.pathnodes = initial_pathnodes
+
+    def __len__(self):
+        return len(self.pathnodes)
+
+    def __repr__(self) -> str:
+        return str([str(x) for x in self.pathnodes])
 
     def get_path(self):
         return self.pathnodes
@@ -138,6 +158,7 @@ class Path:
             return temp
         else:
             print("Popped from empty Path")
+            breakpoint()
             exit()
 
 
@@ -200,7 +221,7 @@ class Agent:
     def soft_simulation_timestep_update(self):
         # if the agent has no plan is taskless
         print("Dynamics for agent ", self.ID)
-        if self.planned_path is None:
+        if self.planned_path is None or len(self.planned_path) == 0:
             print("     Agent stationary")
             print("     current loc", self.loc)
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
