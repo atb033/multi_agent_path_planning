@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
-import multi_agent_path_planning
+import logging
 
 
 class Location:
@@ -105,7 +105,6 @@ class TaskSet:
 
 class PathNode:
     def __init__(self, loc, timestep):
-        # print('New Path Node with Location:', loc," Time: ",timestep)
         self.loc = Location(loc)
         self.timestep = timestep
 
@@ -144,33 +143,20 @@ class Path:
         return self.pathnodes
 
     def add_pathnode(self, pathnode: PathNode):
-        # print('path node added ', len(self.pathnodes))
         self.pathnodes.append(pathnode)
 
     def pop_pathnode(self):
         if len(self.pathnodes) > 0:
-            # print('')
-            # TODO: Debug time issue
-            # print("Lenth of path before popping",len(self.pathnodes))
             temp = self.pathnodes.pop(0)
-            # print("Lenth of path after popping",len(self.pathnodes))
-            # print("Location of popped path node",temp.loc)
-            # print("World time of popped path node",temp.timestep)
-            # print('')
             return temp
         else:
-            print("Popped from empty Path")
-            breakpoint()
+            logging.error("Popped from empty Path")
             exit()
 
 
 class Agent:
     def __init__(
-        self,
-        loc,
-        ID,
-        goal=None,
-        task: Task = None,
+        self, loc, ID, goal=None, task: Task = None,
     ):
         """_summary_
 
@@ -213,31 +199,31 @@ class Agent:
         return self.goal is not None
 
     def set_planned_path_from_plan(self, plan):
-        print("Updating plan by adding nodes", self.ID)
+        logging.info("Updating plan by adding nodes", self.ID)
         temp_path = Path()
         for node in plan[self.ID][1:]:
             temp_loc = Location.from_xy((node["x"], node["y"]))
             temp_time = node["t"]
 
-            print(" adding node", temp_loc, temp_time)
+            logging.info(" adding node", temp_loc, temp_time)
             temp_path.add_pathnode(PathNode(temp_loc, temp_time))
 
         self.planned_path = temp_path
 
     def soft_simulation_timestep_update(self):
         # if the agent has no plan is taskless
-        print("Dynamics for agent ", self.ID)
+        logging.info(f"Dynamics for agent {self.ID}")
         if self.planned_path is None or len(self.planned_path) == 0:
-            print("     Agent stationary")
-            print("     current loc", self.loc)
+            logging.info("     Agent stationary")
+            logging.info(f"     current loc {self.loc}")
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             self.idle_timesteps += 1
         else:
-            print("     Agent on the move")
-            print("     current loc", self.loc)
+            logging.info("     Agent on the move")
+            logging.info(f"     current loc {self.loc}")
             self.loc = self.planned_path.pop_pathnode().get_loc()
-            print("     next loc", self.loc)
+            logging.info(f"     next loc {self.loc}")
             self.executed_path.add_pathnode(PathNode(self.loc, self.timestep))
             self.timestep += 1
             # if path is exausted (goal reached)
@@ -294,7 +280,7 @@ class AgentSet:
         for index, agent in enumerate(self.agents):
             if agent.get_id() == search_id:
                 return index
-        print("agent ID does not exist in agent list")
+        logging.warn("agent ID does not exist in agent list")
         return False
 
 
@@ -304,7 +290,7 @@ class Map:
             try:
                 self.map_dict = yaml.load(map_file, Loader=yaml.FullLoader)["map"]
             except yaml.YAMLError as exc:
-                print(exc)
+                logging.error(exc)
         self.map_np = np.ones(self.map_dict["dimensions"]).astype(bool)
         for obstacle in self.map_dict["obstacles"]:
             self.map_np[obstacle[0], obstacle[1]] = False

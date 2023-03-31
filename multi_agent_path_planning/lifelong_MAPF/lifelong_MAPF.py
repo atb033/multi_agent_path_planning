@@ -24,9 +24,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="input file")
     parser.add_argument("output", help="output file with the schedule")
-    args = parser.parse_args()
+    parser.add_argument(
+        "-log",
+        "--loglevel",
+        default="warning",
+        help="Provide logging level. Example --loglevel debug, default=warning",
+        choices=logging._nameToLevel.keys(),
+    )
 
-    print(args.input)
+    args = parser.parse_args()
+    logging.basicConfig(level=args.loglevel.upper())
+
+    logging.info(args.input)
 
     world_map = Map(args.input)
 
@@ -42,7 +51,7 @@ def main():
     with open(args.output, "w") as output_yaml:
         yaml.safe_dump(output, output_yaml)
 
-    print("the end")
+    logging.info("the end")
 
 
 def lifelong_MAPF_experiment(
@@ -75,20 +84,20 @@ def lifelong_MAPF_experiment(
 
     # Run for a fixed number of timesteps
     for timestep in range(max_timesteps):
-        print("     ")
-        print("Timestep: ", timestep)
+        logging.info("     ")
+        logging.info(f"Timestep: {timestep}")
 
         # Ask the task factory for new task
         new_tasks, no_new_tasks = task_factory.produce_tasks(timestep=timestep)
         # Add them to the existing list
         open_tasks.add_tasks(new_tasks)
 
-        print("Number of Open Tasks: ", open_tasks.__len__())
+        logging.info(f"Number of Open Tasks: {open_tasks.__len__()}")
 
         # If there are no current tasks and the factory says there won't be any more
         # and all the agents are at the goal, break
         if len(open_tasks) == 0 and no_new_tasks and agents_at_goals:
-            print("Jobs Done")
+            logging.info("Jobs Done")
             break
 
         # Assign the open tasks to the open agents
@@ -96,14 +105,11 @@ def lifelong_MAPF_experiment(
 
         # Plan all the required paths
         agents = mapf_solver.solve_MAPF_instance(
-            map_instance=map_instance,
-            agents=agents,
-            timestep=timestep,
+            map_instance=map_instance, agents=agents, timestep=timestep,
         )
         # Step the simulation one step and record the paths
         (agents, agents_at_goals) = dynamics_simulator.step_world(
-            agents=agents,
-            timestep=timestep,
+            agents=agents, timestep=timestep,
         )
 
     return agents.get_executed_paths()
