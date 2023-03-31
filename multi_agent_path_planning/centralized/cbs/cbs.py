@@ -9,10 +9,11 @@ import sys
 
 sys.path.insert(0, "../")
 import argparse
-import yaml
-from math import fabs
-from itertools import combinations
 from copy import deepcopy
+from itertools import combinations
+from math import fabs
+
+import yaml
 
 from multi_agent_path_planning.centralized.cbs.a_star import AStar
 

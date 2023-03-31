@@ -4,10 +4,10 @@ Plotting tool for 2D multi-robot system
 author: Ashwin Bose (@atb033)
 """
 
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib.patches import Circle
+import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.patches import Circle
 
 
 def plot_robot_and_obstacles(

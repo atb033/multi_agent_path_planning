@@ -8,8 +8,9 @@ author: Ashwin Bose (@atb033)
 import sys
 
 sys.path.insert(0, "../")
-import yaml
 import argparse
+
+import yaml
 
 from multi_agent_path_planning.centralized.cbs.cbs import Location
 

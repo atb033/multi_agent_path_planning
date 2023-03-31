@@ -1,4 +1,5 @@
 import typing
+
 import numpy as np
 
 from multi_agent_path_planning.lifelong_MAPF.datastuctures import AgentSet, TaskSet

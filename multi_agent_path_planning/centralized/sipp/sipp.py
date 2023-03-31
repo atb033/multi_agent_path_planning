@@ -9,8 +9,10 @@ See the article: DOI: 10.1109/ICRA.2011.5980306
 """
 
 import argparse
-import yaml
 from math import fabs
+
+import yaml
+
 from multi_agent_path_planning.centralized.sipp.graph_generation import SippGraph, State
 
 

@@ -1,7 +1,9 @@
-import yaml
 import typing
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
+import yaml
+
 import multi_agent_path_planning
 
 
@@ -164,7 +166,11 @@ class Path:
 
 class Agent:
     def __init__(
-        self, loc, ID, goal=None, task: Task = None,
+        self,
+        loc,
+        ID,
+        goal=None,
+        task: Task = None,
     ):
         """_summary_
 

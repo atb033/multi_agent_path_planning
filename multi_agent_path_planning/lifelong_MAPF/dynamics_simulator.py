@@ -1,4 +1,5 @@
 import typing
+
 from multi_agent_path_planning.lifelong_MAPF.datastuctures import AgentSet
 
 
@@ -6,7 +7,9 @@ class BaseDynamicsSimulator:
     """ """
 
     def step_world(
-        self, agents: AgentSet, timestep: int,
+        self,
+        agents: AgentSet,
+        timestep: int,
     ):
         """
         Args:

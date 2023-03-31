@@ -1,5 +1,5 @@
 import yaml
-from datastuctures import AgentSet, Agent, Map
+from datastuctures import Agent, AgentSet, Map
 
 
 def make_agent_set(input):
@@ -25,7 +25,9 @@ def make_agent_set(input):
 
 
 def make_map_dict_dynamic_obs(
-    map_instance: Map, agents: AgentSet, timestep: int,
+    map_instance: Map,
+    agents: AgentSet,
+    timestep: int,
 ):
     yaml_style_map = {}
     agents_style_map_list = []

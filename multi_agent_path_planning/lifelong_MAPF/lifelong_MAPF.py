@@ -96,11 +96,14 @@ def lifelong_MAPF_experiment(
 
         # Plan all the required paths
         agents = mapf_solver.solve_MAPF_instance(
-            map_instance=map_instance, agents=agents, timestep=timestep,
+            map_instance=map_instance,
+            agents=agents,
+            timestep=timestep,
         )
         # Step the simulation one step and record the paths
         (agents, agents_at_goals) = dynamics_simulator.step_world(
-            agents=agents, timestep=timestep,
+            agents=agents,
+            timestep=timestep,
         )
 
     return agents.get_executed_paths()
