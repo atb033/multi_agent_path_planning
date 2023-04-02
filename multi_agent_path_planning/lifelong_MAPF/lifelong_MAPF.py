@@ -37,7 +37,6 @@ def main():
         task_allocator=RandomTaskAllocator(),
         mapf_solver=SippSolver(),
         dynamics_simulator=BaseDynamicsSimulator(),
-        max_timesteps = 5
     )
 
     with open(args.output, "w") as output_yaml:
@@ -53,7 +52,7 @@ def lifelong_MAPF_experiment(
     task_allocator: BaseTaskAllocator,
     mapf_solver: BaseMAPFSolver,
     dynamics_simulator: BaseDynamicsSimulator,
-    max_timesteps: int = 20,
+    max_timesteps: int = 50,
 ):
     """
     Arguments:
@@ -116,6 +115,15 @@ def lifelong_MAPF_experiment(
         (agents, agents_at_goals) = dynamics_simulator.step_world(
             agents=agents, timestep=timestep,
         )
+
+    for agent in agents.agents:
+        if agent.get_goal() is not None:
+            temp = {}
+            temp["x"] = int(agent.get_goal().x())
+            temp["y"] = int(agent.get_goal().y())
+            temp["t"] = int(timestep)+1
+            active_goal_list.append(temp)
+    output["active_goals"] = active_goal_list
 
     # Combine visualization data
     output.update(agents.get_executed_paths())
