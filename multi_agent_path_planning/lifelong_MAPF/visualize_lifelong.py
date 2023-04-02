@@ -16,13 +16,13 @@ Colors = ["orange", "blue", "green"]
 
 
 class Animation:
-    def __init__(self, map, schedule):
+    def __init__(self, map, output):
         self.map = map
-        self.schedule = schedule
-        self.obstacle_schedule = map["dynamic_obstacles"]
-        self.combined_schedule = {}
-        self.combined_schedule.update(self.schedule["schedule"])
-        self.combined_schedule.update(self.obstacle_schedule)
+        self.output = output
+        self.obstacle_output = map["dynamic_obstacles"]
+        self.combined_output = {}
+        self.combined_output.update(self.output["schedule"])
+        self.combined_output.update(self.obstacle_output)
 
         aspect = map["map"]["dimensions"][0] / map["map"]["dimensions"][1]
 
@@ -91,7 +91,7 @@ class Animation:
             )
             self.agents[name].original_face_color = Colors[0]
             self.patches.append(self.agents[name])
-            self.T = max(self.T, schedule["schedule"][name][-1]["t"])
+            self.T = max(self.T, output["schedule"][name][-1]["t"])
             self.agent_names[name] = self.ax.text(
                 d["start"][0], d["start"][1], name.replace("agent", "")
             )
@@ -99,7 +99,7 @@ class Animation:
             self.agent_names[name].set_verticalalignment("center")
             self.artists.append(self.agent_names[name])
 
-        for name in self.obstacle_schedule:
+        for name in self.obstacle_output:
             self.agents[name] = Circle(
                 (d["start"][0], d["start"][1]),
                 0.3,
@@ -146,7 +146,7 @@ class Animation:
         return self.patches + self.artists
 
     def animate_func(self, i):
-        for agent_name, agent in self.combined_schedule.items():
+        for agent_name, agent in self.combined_output.items():
             pos = self.getState(i / 10, agent)
             p = (pos[0], pos[1])
             self.agents[agent_name].center = p
@@ -191,7 +191,7 @@ class Animation:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("map", help="input file containing map")
-    parser.add_argument("schedule", help="schedule for agents")
+    parser.add_argument("output", help="output for agents")
     parser.add_argument(
         "--video",
         dest="video",
@@ -204,10 +204,10 @@ if __name__ == "__main__":
     with open(args.map) as map_file:
         map = yaml.load(map_file, Loader=yaml.FullLoader)
 
-    with open(args.schedule) as states_file:
-        schedule = yaml.load(states_file, Loader=yaml.FullLoader)
+    with open(args.output) as states_file:
+        output = yaml.load(states_file, Loader=yaml.FullLoader)
 
-    animation = Animation(map, schedule)
+    animation = Animation(map, output)
 
     if args.video:
         animation.save(args.video, args.speed)

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import multi_agent_path_planning
 
-
+np.random.seed(0)
 class Location:
     def __init__(self, loc):
         """Reduce ambiguity about i,j vs. x,y convention
