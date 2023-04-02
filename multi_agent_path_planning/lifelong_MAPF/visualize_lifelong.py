@@ -37,6 +37,7 @@ class Animation:
         self.artists = []
         self.agents = dict()
         self.agent_names = dict()
+        self.active_goals = dict()
         # create boundary patch
         xmin = -0.5
         ymin = -0.5
@@ -70,17 +71,29 @@ class Animation:
         # create agents:
         self.T = 0
         # draw goals first
-        for d, i in zip(map["agents"], range(0, len(map["agents"]))):
-            self.patches.append(
-                Rectangle(
-                    (d["goal"][0] - 0.25, d["goal"][1] - 0.25),
+        # for d, i in zip(map["agents"], range(0, len(map["agents"]))):
+        #     self.patches.append(
+        #         Rectangle(
+        #             (d["goal"][0] - 0.25, d["goal"][1] - 0.25),
+        #             0.5,
+        #             0.5,
+        #             facecolor=Colors[0],
+        #             edgecolor="black",
+        #             alpha=0.5,
+        #         )
+        #     )
+        # Active goals
+        for d, i in zip(output["active_goals"], range(0, len(output["active_goals"]))):
+            self.active_goals[i] = Rectangle(
+                    (d["x"] - 0.25, d["y"] - 0.25),
                     0.5,
                     0.5,
-                    facecolor=Colors[0],
+                    facecolor="lime",
                     edgecolor="black",
                     alpha=0.5,
                 )
-            )
+            self.patches.append(self.active_goals[i])
+        # Agents
         for d, i in zip(map["agents"], range(0, len(map["agents"]))):
             name = d["name"]
             self.agents[name] = Circle(
@@ -146,6 +159,15 @@ class Animation:
         return self.patches + self.artists
 
     def animate_func(self, i):
+        for i_active_goal,active_goal in enumerate(self.output['active_goals']):
+            t = int(np.floor(i/10))
+            if t == active_goal['t']:
+                p = (active_goal['x'], active_goal['y'])
+                self.active_goals[i_active_goal].center = p
+                self.active_goals[i_active_goal].set_alpha(1.0)
+            else:
+                self.active_goals[i_active_goal].set_alpha(0.0)
+
         for agent_name, agent in self.combined_output.items():
             pos = self.getState(i / 10, agent)
             p = (pos[0], pos[1])
