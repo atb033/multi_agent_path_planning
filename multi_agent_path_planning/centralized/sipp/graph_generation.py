@@ -9,8 +9,9 @@ See the article: 10.1109/ICRA.2011.5980306
 """
 
 import argparse
-import yaml
 from bisect import bisect
+
+import yaml
 
 
 class State(object):

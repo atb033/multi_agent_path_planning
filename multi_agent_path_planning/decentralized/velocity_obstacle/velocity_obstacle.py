@@ -4,16 +4,17 @@ Collision avoidance using Velocity-obstacle method
 author: Ashwin Bose (atb033@github.com)
 """
 
-from multi_agent_path_planning.decentralized.utils.multi_robot_plot import (
-    plot_robot_and_obstacles,
+import numpy as np
+
+from multi_agent_path_planning.decentralized.utils.control import (
+    compute_desired_velocity,
 )
 from multi_agent_path_planning.decentralized.utils.create_obstacles import (
     create_obstacles,
 )
-from multi_agent_path_planning.decentralized.utils.control import (
-    compute_desired_velocity,
+from multi_agent_path_planning.decentralized.utils.multi_robot_plot import (
+    plot_robot_and_obstacles,
 )
-import numpy as np
 
 SIM_TIME = 5.0
 TIMESTEP = 0.1

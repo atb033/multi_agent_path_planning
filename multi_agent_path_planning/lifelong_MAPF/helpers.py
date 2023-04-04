@@ -1,5 +1,6 @@
 import yaml
-from datastuctures import AgentSet, Agent, Map
+from datastuctures import Agent, AgentSet, Map
+import logging
 
 
 def make_agent_set(input):
@@ -15,7 +16,7 @@ def make_agent_set(input):
         try:
             temp = yaml.load(input_file, Loader=yaml.FullLoader)
         except yaml.YAMLError as exc:
-            print(exc)
+            logging.error(exc)
     # encorporate the actual agent class!
     agent_list = []
     for agent in temp["agents"]:
@@ -43,7 +44,7 @@ def make_map_dict_dynamic_obs(
         if (type(agent.get_goal()) != type(None)) and (
             type(agent.get_planned_path()) == type(None)
         ):
-            print("Agent :", agent.get_id(), "needs a path!")
+            logging.info(f"Agent : {agent.get_id()} needs a path!")
             temp = {}
             temp["start"] = agent.get_loc().as_xy()  # TODO verify this is what's needed
             temp["goal"] = agent.get_goal().as_xy()  # TODO same as above
@@ -53,7 +54,7 @@ def make_map_dict_dynamic_obs(
         # take all agents with planned_paths, and turn their path into dynamic obstacles
         # for agents that are in motion
         elif type(agent.get_planned_path()) != type(None):
-            print("Agent :", agent.get_id(), "needs planning around!")
+            logging.info(f"Agent : {agent.get_id()} needs planning around!")
             temp_list = []
             # TODO is this the correct default if no paths are planned
             time = agent.timestep
@@ -61,13 +62,11 @@ def make_map_dict_dynamic_obs(
 
             # make dynamic obstacles
             for path_node in agent.get_planned_path().get_path():
-                # print(path_node.get_loc(), path_node.get_time())
                 temp_dict = {}
+
                 loc = path_node.get_loc()
-                # print("Path node time ----- ", path_node.get_time())
-                # print("Its Timestep", timestep)
                 time = int(path_node.get_time())
-                # print("Time diff setter for local planning", time)
+
                 temp_dict["x"] = loc.x()
                 temp_dict["y"] = loc.y()
                 temp_dict["t"] = time
@@ -84,7 +83,7 @@ def make_map_dict_dynamic_obs(
 
         # for stationary agents
         else:
-            print("Agent :", agent.get_id(), "is stationary")
+            logging.info(f"Agent : {agent.get_id()} is stationary")
             # make non-moving dynamic obstacle from agent last pose
             temp_list = []
             loc = agent.get_loc()

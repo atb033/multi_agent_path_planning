@@ -1,8 +1,9 @@
+import argparse
+
+from multi_agent_path_planning.decentralized.nmpc import nmpc
 from multi_agent_path_planning.decentralized.velocity_obstacle import (
     velocity_obstacle as velocity_obstacle,
 )
-from multi_agent_path_planning.decentralized.nmpc import nmpc
-import argparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

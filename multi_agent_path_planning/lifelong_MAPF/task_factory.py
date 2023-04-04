@@ -1,3 +1,4 @@
+import logging
 from multi_agent_path_planning.lifelong_MAPF.datastuctures import Map, Task
 
 
@@ -53,7 +54,7 @@ class RandomTaskFactory:
         task_list = []
         for _ in range(self.tasks_per_timestep):
             start, goal = self.world_map.get_random_unoccupied_locs(2)
-            print("New Task Start: ", start, " New Task Goal: ", goal)
+            logging.info(f"New Task Start: {start} New Task Goal: {goal}")
             new_task = Task(start=start, goal=goal, timestep=timestep, task_id = self.next_task_id)
             task_list.append(new_task)
             self.next_task_id+=1
