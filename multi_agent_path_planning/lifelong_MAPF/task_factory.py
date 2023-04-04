@@ -38,6 +38,7 @@ class RandomTaskFactory:
         self.world_map = world_map
         self.tasks_per_timestep = tasks_per_timestep
         self.max_timestep = max_timestep
+        self.next_task_id = 0
 
     def produce_tasks(self, timestep: int = None):
         """
@@ -54,7 +55,8 @@ class RandomTaskFactory:
         for _ in range(self.tasks_per_timestep):
             start, goal = self.world_map.get_random_unoccupied_locs(2)
             logging.info(f"New Task Start: {start} New Task Goal: {goal}")
-            new_task = Task(start=start, goal=goal, timestep=timestep)
+            new_task = Task(start=start, goal=goal, timestep=timestep, task_id = self.next_task_id)
             task_list.append(new_task)
+            self.next_task_id+=1
 
         return task_list, False

@@ -17,13 +17,13 @@ Colors = ["orange", "blue", "green"]
 
 
 class Animation:
-    def __init__(self, map, schedule):
+    def __init__(self, map, output):
         self.map = map
-        self.schedule = schedule
-        self.obstacle_schedule = map["dynamic_obstacles"]
-        self.combined_schedule = {}
-        self.combined_schedule.update(self.schedule["schedule"])
-        self.combined_schedule.update(self.obstacle_schedule)
+        self.output = output
+        self.obstacle_output = map["dynamic_obstacles"]
+        self.combined_output = {}
+        self.combined_output.update(self.output["schedule"])
+        self.combined_output.update(self.obstacle_output)
 
         aspect = map["map"]["dimensions"][0] / map["map"]["dimensions"][1]
 
@@ -38,6 +38,15 @@ class Animation:
         self.artists = []
         self.agents = dict()
         self.agent_names = dict()
+        self.active_starts = dict()
+        self.active_goals = dict()
+        self.active_start_ids = dict()
+        self.active_goal_ids = dict()
+        self.open_starts = dict()
+        self.open_goals = dict()
+        self.open_start_ids = dict()
+        self.open_goal_ids = dict()
+        self.open_alpha = 0.2
         # create boundary patch
         xmin = -0.5
         ymin = -0.5
@@ -71,17 +80,70 @@ class Animation:
         # create agents:
         self.T = 0
         # draw goals first
-        for d, i in zip(map["agents"], range(0, len(map["agents"]))):
-            self.patches.append(
-                Rectangle(
-                    (d["goal"][0] - 0.25, d["goal"][1] - 0.25),
-                    0.5,
-                    0.5,
-                    facecolor=Colors[0],
-                    edgecolor="black",
-                    alpha=0.5,
-                )
-            )
+        # for d, i in zip(map["agents"], range(0, len(map["agents"]))):
+        #     self.patches.append(
+        #         Rectangle(
+        #             (d["goal"][0] - 0.25, d["goal"][1] - 0.25),
+        #             0.5,
+        #             0.5,
+        #             facecolor=Colors[0],
+        #             edgecolor="black",
+        #             alpha=0.5,
+        #         )
+        #     )
+        # Active tasks
+        for d, i in zip(output["active_tasks"], range(0, len(output["active_tasks"]))):
+            id = d['task_id']
+            if id not in self.active_starts.keys():
+                self.active_starts[id] = Rectangle(
+                        (d['start']["x"] - 0.25, d['start']["y"] - 0.25),
+                        0.5,
+                        0.5,
+                        facecolor="cyan",
+                        edgecolor="black",
+                        alpha=1.0,
+                    )
+                self.active_goals[id] = Rectangle(
+                        (d['goal']["x"] - 0.25, d['goal']["y"] - 0.25),
+                        0.5,
+                        0.5,
+                        facecolor="lime",
+                        edgecolor="black",
+                        alpha=1.0,
+                    )
+                self.active_start_ids[id] = self.ax.text(d["start"]['x'], d["start"]['y'], d['task_id'])
+                self.active_goal_ids[id] = self.ax.text(d["goal"]['x'], d["goal"]['y'], d['task_id'])
+                self.artists.append(self.active_start_ids[id])
+                self.artists.append(self.active_goal_ids[id])
+                self.patches.append(self.active_starts[id])
+                self.patches.append(self.active_goals[id])
+        # Open tasks
+        for d, i in zip(output["open_tasks"], range(0, len(output["open_tasks"]))):
+            id = d['task_id']
+            if id not in self.open_starts.keys():
+                self.open_starts[id] = Rectangle(
+                        (d['start']["x"] - 0.25, d['start']["y"] - 0.25),
+                        0.5,
+                        0.5,
+                        facecolor="cyan",
+                        edgecolor="black",
+                        alpha=self.open_alpha,
+                    )
+                self.open_goals[id] = Rectangle(
+                        (d['goal']["x"] - 0.25, d['goal']["y"] - 0.25),
+                        0.5,
+                        0.5,
+                        facecolor="lime",
+                        edgecolor="black",
+                        alpha=self.open_alpha,
+                    )
+                self.open_start_ids[id] = self.ax.text(d["start"]['x'], d["start"]['y'], d['task_id'],alpha=self.open_alpha)
+                self.open_goal_ids[id] = self.ax.text(d["goal"]['x'], d["goal"]['y'], d['task_id'],alpha=self.open_alpha)
+                self.artists.append(self.open_start_ids[id])
+                self.artists.append(self.open_goal_ids[id])
+                self.patches.append(self.open_starts[id])
+                self.patches.append(self.open_goals[id])
+        # Agents
         for d, i in zip(map["agents"], range(0, len(map["agents"]))):
             name = d["name"]
             self.agents[name] = Circle(
@@ -92,7 +154,7 @@ class Animation:
             )
             self.agents[name].original_face_color = Colors[0]
             self.patches.append(self.agents[name])
-            self.T = max(self.T, schedule["schedule"][name][-1]["t"])
+            self.T = max(self.T, output["schedule"][name][-1]["t"])
             self.agent_names[name] = self.ax.text(
                 d["start"][0], d["start"][1], name.replace("agent", "")
             )
@@ -100,7 +162,7 @@ class Animation:
             self.agent_names[name].set_verticalalignment("center")
             self.artists.append(self.agent_names[name])
 
-        for name in self.obstacle_schedule:
+        for name in self.obstacle_output:
             self.agents[name] = Circle(
                 (d["start"][0], d["start"][1]),
                 0.3,
@@ -122,6 +184,9 @@ class Animation:
         # self.fig.axes.get_yaxis().set_visible(False)
 
         # self.fig.tight_layout()
+        self.progress = self.ax.text(0, 0,'',fontweight='bold',color='black', horizontalalignment="left",verticalalignment="center")
+        self.artists.append(self.progress)
+        
 
         self.anim = animation.FuncAnimation(
             self.fig,
@@ -147,7 +212,51 @@ class Animation:
         return self.patches + self.artists
 
     def animate_func(self, i):
-        for agent_name, agent in self.combined_schedule.items():
+        t = int(np.floor(i/10))
+
+        self.progress.set_text(f"Timestep: {i/10:.1f} / {self.T}")
+
+        # Active tasks
+        for id in self.active_starts.keys():
+            for active_task in self.output['active_tasks']:
+                if active_task['task_id'] == id:
+                    if t == active_task['t']:
+                        p_start = (active_task['start']['x'], active_task['start']['y'])
+                        self.active_starts[id].center = p_start
+                        self.active_starts[id].set_alpha(1.0)
+                        p_goal = (active_task['goal']['x'], active_task['goal']['y'])
+                        self.active_goals[id].center = p_goal
+                        self.active_goals[id].set_alpha(1.0)
+                        self.active_start_ids[id].set_alpha(1.0)
+                        self.active_goal_ids[id].set_alpha(1.0)
+                        break
+                    else:
+                        self.active_starts[id].set_alpha(0.0)
+                        self.active_goals[id].set_alpha(0.0)
+                        self.active_start_ids[id].set_alpha(0.0)
+                        self.active_goal_ids[id].set_alpha(0.0)
+        # Open tasks
+        for id in self.open_starts.keys():
+            for open_task in self.output['open_tasks']:
+                if open_task['task_id'] == id:
+                    active_offset = int(len(self.active_starts)*2)
+                    if t == open_task['t']:
+                        p_start = (open_task['start']['x'], open_task['start']['y'])
+                        self.open_starts[id].center = p_start
+                        self.open_starts[id].set_alpha(self.open_alpha)
+                        p_goal = (open_task['goal']['x'], open_task['goal']['y'])
+                        self.open_goals[id].center = p_goal
+                        self.open_goals[id].set_alpha(self.open_alpha)
+                        self.open_start_ids[id].set_alpha(self.open_alpha)
+                        self.open_goal_ids[id].set_alpha(self.open_alpha)
+                        break
+                    else:
+                        self.open_starts[id].set_alpha(0.0)
+                        self.open_goals[id].set_alpha(0.0)
+                        self.open_start_ids[id].set_alpha(0.0)
+                        self.open_goal_ids[id].set_alpha(0.0)
+
+        for agent_name, agent in self.combined_output.items():
             pos = self.getState(i / 10, agent)
             p = (pos[0], pos[1])
             self.agents[agent_name].center = p
@@ -192,7 +301,7 @@ class Animation:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("map", help="input file containing map")
-    parser.add_argument("schedule", help="schedule for agents")
+    parser.add_argument("output", help="output for agents")
     parser.add_argument(
         "--video",
         dest="video",
@@ -205,10 +314,10 @@ if __name__ == "__main__":
     with open(args.map) as map_file:
         map = yaml.load(map_file, Loader=yaml.FullLoader)
 
-    with open(args.schedule) as states_file:
-        schedule = yaml.load(states_file, Loader=yaml.FullLoader)
+    with open(args.output) as states_file:
+        output = yaml.load(states_file, Loader=yaml.FullLoader)
 
-    animation = Animation(map, schedule)
+    animation = Animation(map, output)
 
     if args.video:
         animation.save(args.video, args.speed)

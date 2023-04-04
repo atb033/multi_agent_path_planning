@@ -43,7 +43,7 @@ def main():
     output = lifelong_MAPF_experiment(
         map_instance=world_map,
         initial_agents=make_agent_set(args.input),
-        task_factory=RandomTaskFactory(world_map),
+        task_factory=RandomTaskFactory(world_map,max_timestep=5),
         task_allocator=RandomTaskAllocator(),
         mapf_solver=CBSSolver(),
         dynamics_simulator=BaseDynamicsSimulator(),
@@ -62,7 +62,7 @@ def lifelong_MAPF_experiment(
     task_allocator: BaseTaskAllocator,
     mapf_solver: BaseMAPFSolver,
     dynamics_simulator: BaseDynamicsSimulator,
-    max_timesteps: int = 20,
+    max_timesteps: int = 100,
 ):
     """
     Arguments:
@@ -82,6 +82,10 @@ def lifelong_MAPF_experiment(
 
     # Agents are not all at their goals
     agents_at_goals = False
+
+    output = {}
+    active_task_list = []
+    open_task_list = []
 
     # Run for a fixed number of timesteps
     for timestep in range(max_timesteps):
@@ -104,6 +108,21 @@ def lifelong_MAPF_experiment(
         # Assign the open tasks to the open agents
         agents = task_allocator.allocate_tasks(open_tasks, agents)
 
+        # Save active tasks        
+        for agent in agents.agents:
+            if agent.task is not None:
+                task_dict = agent.task.get_dict()
+                task_dict['t'] = timestep
+                active_task_list.append(task_dict)
+        output["active_tasks"] = active_task_list
+
+        # Save open tasks        
+        for open_task in open_tasks.task_dict.values():
+            task_dict = open_task.get_dict()
+            task_dict['t'] = timestep
+            open_task_list.append(task_dict)
+        output["open_tasks"] = open_task_list
+        
         # Plan all the required paths
         agents = mapf_solver.solve_MAPF_instance(
             map_instance=map_instance, agents=agents, timestep=timestep,
@@ -113,7 +132,22 @@ def lifelong_MAPF_experiment(
             agents=agents, timestep=timestep,
         )
 
-    return agents.get_executed_paths()
+    # Save tasks one more time to match timestep of agents
+    for agent in agents.agents:
+        if agent.task is not None:
+            task_dict = agent.task.get_dict()
+            task_dict['t'] = timestep+1
+            active_task_list.append(task_dict)
+    output["active_tasks"] = active_task_list
+    for open_task in open_tasks.task_dict.values():
+        task_dict = open_task.get_dict()
+        task_dict['t'] = timestep+1
+        open_task_list.append(task_dict)
+    output["open_tasks"] = open_task_list
+
+    # Combine visualization data
+    output.update(agents.get_executed_paths())
+    return output
 
 
 if __name__ == "__main__":
