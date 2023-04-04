@@ -395,7 +395,7 @@ def main():
     agents = param["agents"]
 
     env = Environment(dimension, agents, obstacles)
-
+    breakpoint()
     # Searching
     cbs = CBS(env)
     solution = cbs.search()

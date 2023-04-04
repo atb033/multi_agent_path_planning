@@ -9,6 +9,7 @@ from multi_agent_path_planning.lifelong_MAPF.helpers import *
 from multi_agent_path_planning.lifelong_MAPF.mapf_solver import (
     BaseMAPFSolver,
     SippSolver,
+    CBSSolver,
 )
 from multi_agent_path_planning.lifelong_MAPF.task_allocator import (
     BaseTaskAllocator,
@@ -44,7 +45,7 @@ def main():
         initial_agents=make_agent_set(args.input),
         task_factory=RandomTaskFactory(world_map),
         task_allocator=RandomTaskAllocator(),
-        mapf_solver=SippSolver(),
+        mapf_solver=CBSSolver(),
         dynamics_simulator=BaseDynamicsSimulator(),
     )
 

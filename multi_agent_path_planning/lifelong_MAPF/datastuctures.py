@@ -1,5 +1,5 @@
 import typing
-
+import multi_agent_path_planning
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
@@ -34,7 +34,10 @@ class Location:
         return (self.x(), self.y())
 
     def __eq__(self, __value: object) -> bool:
-        return self.ij_loc == __value.ij_loc
+        try:
+            return self.ij_loc == __value.ij_loc
+        except:
+            return False
 
     def x(self):
         return self.ij_loc[1]
@@ -195,17 +198,27 @@ class Agent:
     def get_executed_path(self):
         return self.executed_path
 
+    def get_as_dict(self):
+        # {'start': [0, 0], 'goal': [2, 0], 'name': 'agent0'}
+        return {
+            "start": list(self.loc.as_xy()),
+            "goal": list(self.goal.as_xy())
+            if self.goal is not None
+            else None,  # There is no goal set
+            "name": str(self.ID),
+        }
+
     def is_allocated(self):
         return self.goal is not None
 
     def set_planned_path_from_plan(self, plan):
-        logging.info("Updating plan by adding nodes", self.ID)
+        logging.info(f"Updating plan by adding nodes {self.ID}")
         temp_path = Path()
         for node in plan[self.ID][1:]:
             temp_loc = Location.from_xy((node["x"], node["y"]))
             temp_time = node["t"]
 
-            logging.info(" adding node", temp_loc, temp_time)
+            logging.info(f" adding node {temp_loc} {temp_time}")
             temp_path.add_pathnode(PathNode(temp_loc, temp_time))
 
         self.planned_path = temp_path
@@ -283,6 +296,9 @@ class AgentSet:
         logging.warn("agent ID does not exist in agent list")
         return False
 
+    def get_agent_dict(self):
+        return [agent.get_as_dict() for agent in self.agents]
+
 
 class Map:
     def __init__(self, map, vis=False):
@@ -292,7 +308,8 @@ class Map:
             except yaml.YAMLError as exc:
                 logging.error(exc)
         self.map_np = np.ones(self.map_dict["dimensions"]).astype(bool)
-        for obstacle in self.map_dict["obstacles"]:
+        self.obstacles = self.map_dict["obstacles"]
+        for obstacle in self.obstacles:
             self.map_np[obstacle[0], obstacle[1]] = False
         self.unoccupied_inds = np.stack(np.where(self.map_np), axis=0).T
         if vis:
@@ -301,6 +318,13 @@ class Map:
 
     def get_map_dict(self):
         return self.map_dict
+
+    def get_dim(self):
+        # TODO make sure this right order
+        return self.map_np.T.shape
+
+    def get_obstacles(self):
+        return self.obstacles
 
     def check_ocupied(self, loc: Location):
         return self.map_np[loc.i(), loc.j()]

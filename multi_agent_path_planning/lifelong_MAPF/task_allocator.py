@@ -44,7 +44,7 @@ class RandomTaskAllocator:
         for agent, task in zip(sampled_agents, sampled_tasks):
             # TODO: make this more elegent, we dont want to assign tasks where the agent is on top of the start, unless we rework some of the initilization stuff, it creates issues with the planner which assumes there is a path required
             if agent.get_loc() != task.start:
-                logging.info("Agent :", agent.get_id(), " has been allocated a task!")
+                logging.info(f"Agent : {agent.get_id()} has been allocated a task!")
                 agent.set_task(task)
             else:
                 logging.info("Agent sitting on goal, moving on...")
