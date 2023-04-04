@@ -39,8 +39,12 @@ class Animation:
         self.agent_names = dict()
         self.active_starts = dict()
         self.active_goals = dict()
+        self.active_start_ids = dict()
+        self.active_goal_ids = dict()
         self.open_starts = dict()
         self.open_goals = dict()
+        self.open_start_ids = dict()
+        self.open_goal_ids = dict()
         self.open_alpha = 0.2
         # create boundary patch
         xmin = -0.5
@@ -106,10 +110,10 @@ class Animation:
                         edgecolor="black",
                         alpha=1.0,
                     )
-                start_id_text = self.ax.text(d["start"]['x'], d["start"]['y'], d['task_id'])
-                goal_id_text = self.ax.text(d["goal"]['x'], d["goal"]['y'], d['task_id'])
-                self.artists.append(start_id_text)
-                self.artists.append(goal_id_text)
+                self.active_start_ids[id] = self.ax.text(d["start"]['x'], d["start"]['y'], d['task_id'])
+                self.active_goal_ids[id] = self.ax.text(d["goal"]['x'], d["goal"]['y'], d['task_id'])
+                self.artists.append(self.active_start_ids[id])
+                self.artists.append(self.active_goal_ids[id])
                 self.patches.append(self.active_starts[id])
                 self.patches.append(self.active_goals[id])
         # Open tasks
@@ -132,10 +136,10 @@ class Animation:
                         edgecolor="black",
                         alpha=self.open_alpha,
                     )
-                start_id_text = self.ax.text(d["start"]['x'], d["start"]['y'], d['task_id'], alpha=self.open_alpha)
-                goal_id_text = self.ax.text(d["goal"]['x'], d["goal"]['y'], d['task_id'], alpha=self.open_alpha)
-                self.artists.append(start_id_text)
-                self.artists.append(goal_id_text)
+                self.open_start_ids[id] = self.ax.text(d["start"]['x'], d["start"]['y'], d['task_id'],alpha=self.open_alpha)
+                self.open_goal_ids[id] = self.ax.text(d["goal"]['x'], d["goal"]['y'], d['task_id'],alpha=self.open_alpha)
+                self.artists.append(self.open_start_ids[id])
+                self.artists.append(self.open_goal_ids[id])
                 self.patches.append(self.open_starts[id])
                 self.patches.append(self.open_goals[id])
         # Agents
@@ -179,6 +183,9 @@ class Animation:
         # self.fig.axes.get_yaxis().set_visible(False)
 
         # self.fig.tight_layout()
+        self.progress = self.ax.text(0, 0,'',fontweight='bold',color='black', horizontalalignment="left",verticalalignment="center")
+        self.artists.append(self.progress)
+        
 
         self.anim = animation.FuncAnimation(
             self.fig,
@@ -206,6 +213,8 @@ class Animation:
     def animate_func(self, i):
         t = int(np.floor(i/10))
 
+        self.progress.set_text(f"Timestep: {i/10:.1f} / {self.T}")
+
         # Active tasks
         for id in self.active_starts.keys():
             for active_task in self.output['active_tasks']:
@@ -217,19 +226,19 @@ class Animation:
                         p_goal = (active_task['goal']['x'], active_task['goal']['y'])
                         self.active_goals[id].center = p_goal
                         self.active_goals[id].set_alpha(1.0)
-                        self.artists[int(id * 2)].set_alpha(1.0)
-                        self.artists[int(id * 2)+1].set_alpha(1.0)
+                        self.active_start_ids[id].set_alpha(1.0)
+                        self.active_goal_ids[id].set_alpha(1.0)
                         break
                     else:
                         self.active_starts[id].set_alpha(0.0)
                         self.active_goals[id].set_alpha(0.0)
-                        self.artists[int(id * 2)].set_alpha(0.0)
-                        self.artists[int(id * 2)+1].set_alpha(0.0)
+                        self.active_start_ids[id].set_alpha(0.0)
+                        self.active_goal_ids[id].set_alpha(0.0)
         # Open tasks
         for id in self.open_starts.keys():
             for open_task in self.output['open_tasks']:
                 if open_task['task_id'] == id:
-                    active_offset = 0#int(len(self.active_starts)*2)
+                    active_offset = int(len(self.active_starts)*2)
                     if t == open_task['t']:
                         p_start = (open_task['start']['x'], open_task['start']['y'])
                         self.open_starts[id].center = p_start
@@ -237,14 +246,14 @@ class Animation:
                         p_goal = (open_task['goal']['x'], open_task['goal']['y'])
                         self.open_goals[id].center = p_goal
                         self.open_goals[id].set_alpha(self.open_alpha)
-                        self.artists[active_offset + int(id * 2)].set_alpha(self.open_alpha)
-                        self.artists[active_offset + int(id * 2)+1].set_alpha(self.open_alpha)
+                        self.open_start_ids[id].set_alpha(self.open_alpha)
+                        self.open_goal_ids[id].set_alpha(self.open_alpha)
                         break
                     else:
                         self.open_starts[id].set_alpha(0.0)
                         self.open_goals[id].set_alpha(0.0)
-                        self.artists[active_offset + int(id * 2)].set_alpha(0.0)
-                        self.artists[active_offset + int(id * 2)+1].set_alpha(0.0)
+                        self.open_start_ids[id].set_alpha(0.0)
+                        self.open_goal_ids[id].set_alpha(0.0)
 
         for agent_name, agent in self.combined_output.items():
             pos = self.getState(i / 10, agent)

@@ -250,6 +250,7 @@ class Agent:
                 # if we have hit the "start" of a "task"
                 if self.loc == self.task.start:
                     self.goal = self.task.goal
+                    self.planned_path = None
                 else:
                     self.goal = None
                     self.task = None

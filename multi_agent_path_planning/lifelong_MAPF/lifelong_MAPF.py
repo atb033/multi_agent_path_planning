@@ -33,7 +33,7 @@ def main():
     output = lifelong_MAPF_experiment(
         map_instance=world_map,
         initial_agents=make_agent_set(args.input),
-        task_factory=RandomTaskFactory(world_map),
+        task_factory=RandomTaskFactory(world_map,max_timestep=5),
         task_allocator=RandomTaskAllocator(),
         mapf_solver=SippSolver(),
         dynamics_simulator=BaseDynamicsSimulator(),
@@ -52,7 +52,7 @@ def lifelong_MAPF_experiment(
     task_allocator: BaseTaskAllocator,
     mapf_solver: BaseMAPFSolver,
     dynamics_simulator: BaseDynamicsSimulator,
-    max_timesteps: int = 30,
+    max_timesteps: int = 100,
 ):
     """
     Arguments:
@@ -122,7 +122,7 @@ def lifelong_MAPF_experiment(
             agents=agents, timestep=timestep,
         )
 
-    # Add active goals one more time to match timestep of agents
+    # Save tasks one more time to match timestep of agents
     for agent in agents.agents:
         if agent.task is not None:
             task_dict = agent.task.get_dict()
