@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import multi_agent_path_planning
 
-# np.random.seed(0)
+np.random.seed(0)
 class Location:
     def __init__(self, loc):
         """Reduce ambiguity about i,j vs. x,y convention
@@ -52,6 +52,16 @@ class Task:
         self.start = Location(start)
         self.goal = Location(goal)
         self.timestep = timestep
+        self.task_id = -1
+
+    def __init__(self, start, goal, timestep, task_id):
+        self.start = Location(start)
+        self.goal = Location(goal)
+        self.timestep = timestep
+        self.task_id = task_id
+
+    def get_dict(self):
+        return {'task_id': int(self.task_id), 'start': {'x': int(self.start.x()), 'y': int(self.start.y())}, 'goal': {'x': int(self.goal.x()), 'y': int(self.goal.y())}, 't': int(self.timestep)}
 
 
 class TaskSet:
