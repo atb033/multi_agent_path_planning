@@ -52,7 +52,7 @@ def lifelong_MAPF_experiment(
     task_allocator: BaseTaskAllocator,
     mapf_solver: BaseMAPFSolver,
     dynamics_simulator: BaseDynamicsSimulator,
-    max_timesteps: int = 5,
+    max_timesteps: int = 10,
 ):
     """
     Arguments:
@@ -75,7 +75,7 @@ def lifelong_MAPF_experiment(
 
     output = {}
     active_task_list = []
-    open_goal_list = []
+    open_task_list = []
 
     # Run for a fixed number of timesteps
     for timestep in range(max_timesteps):
@@ -98,7 +98,7 @@ def lifelong_MAPF_experiment(
         # Assign the open tasks to the open agents
         agents = task_allocator.allocate_tasks(open_tasks, agents)
 
-        # Save active goals        
+        # Save active tasks        
         for agent in agents.agents:
             if agent.task is not None:
                 task_dict = agent.task.get_dict()
@@ -106,9 +106,12 @@ def lifelong_MAPF_experiment(
                 active_task_list.append(task_dict)
         output["active_tasks"] = active_task_list
 
-        # Save open goals        
+        # Save open tasks        
         for open_task in open_tasks.task_dict.values():
-            print(open_task.start, open_task.goal, open_task.timestep)
+            task_dict = open_task.get_dict()
+            task_dict['t'] = timestep
+            open_task_list.append(task_dict)
+        output["open_tasks"] = open_task_list
         
         # Plan all the required paths
         agents = mapf_solver.solve_MAPF_instance(
@@ -126,6 +129,11 @@ def lifelong_MAPF_experiment(
             task_dict['t'] = timestep+1
             active_task_list.append(task_dict)
     output["active_tasks"] = active_task_list
+    for open_task in open_tasks.task_dict.values():
+        task_dict = open_task.get_dict()
+        task_dict['t'] = timestep+1
+        open_task_list.append(task_dict)
+    output["open_tasks"] = open_task_list
 
     # Combine visualization data
     output.update(agents.get_executed_paths())
