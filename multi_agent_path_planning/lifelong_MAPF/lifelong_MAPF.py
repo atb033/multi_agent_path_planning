@@ -43,9 +43,10 @@ def main():
     output = lifelong_MAPF_experiment(
         map_instance=world_map,
         initial_agents=make_agent_set(args.input),
-        task_factory=RandomTaskFactory(world_map,max_timestep=5),
+        task_factory=RandomTaskFactory(world_map,max_timestep=10),
         task_allocator=RandomTaskAllocator(),
-        mapf_solver=CBSSolver(),
+        # mapf_solver=CBSSolver(),
+        mapf_solver=SippSolver(),
         dynamics_simulator=BaseDynamicsSimulator(),
     )
 

@@ -2,9 +2,21 @@ agents:
 -   start: [0, 0]
     name: agent0
     goal: [0,0] # unused
--   start: [4, 4]
+-   start: [0, 1]
     name: agent1
     goal: [4,4] # unused
+# -   start: [0, 2]
+#     name: agent2
+#     goal: [4,4] # unused
+# -   start: [0, 3]
+#     name: agent3
+#     goal: [4,4] # unused
+# -   start: [0, 4]
+#     name: agent4
+#     goal: [4,4] # unused
+# -   start: [0, 5]
+#     name: agent5
+#     goal: [4,4] # unused
 map:
     dimensions: [8, 8]
     obstacles:
