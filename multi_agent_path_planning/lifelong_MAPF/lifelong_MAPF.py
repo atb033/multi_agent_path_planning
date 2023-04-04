@@ -52,7 +52,7 @@ def lifelong_MAPF_experiment(
     task_allocator: BaseTaskAllocator,
     mapf_solver: BaseMAPFSolver,
     dynamics_simulator: BaseDynamicsSimulator,
-    max_timesteps: int = 10,
+    max_timesteps: int = 30,
 ):
     """
     Arguments:
