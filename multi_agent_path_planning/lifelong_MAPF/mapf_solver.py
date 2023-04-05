@@ -86,9 +86,36 @@ class CBSSolver:
     Def
     """
 
-    def set_unset_goals(self, map_instance: Map, agent_list: typing.List[Agent]):
+    def fixup_goals(self, map_instance: Map, agent_list: typing.List[Agent]):
+        """Some goals may be unset, others may be duplicates
+
+        Args:
+            map_instance (Map): _description_
+            agent_list (typing.List[Agent]): _description_
+
+        Returns:
+            _type_: _description_
+        """
         # These are the initial goals which may be None
         initial_goals = [a["goal"] for a in agent_list]
+        # Find duplicate goals
+        unique_goals, inv, counts = np.unique(
+            [(g if g is not None else (np.inf, np.inf)) for g in initial_goals],
+            return_inverse=True,
+            return_counts=True,
+            axis=0,
+        )
+        # Iterate over unique goals
+        for i in range(len(unique_goals)):
+            # If there are duplicates
+            if counts[i] > 1:
+                # Find which inds match
+                duplicate_inds = np.where(inv == i)[0]
+                del_inds = np.random.choice(
+                    duplicate_inds, size=counts[i] - 1, replace=False
+                )
+                for del_ind in del_inds:
+                    initial_goals[del_ind] = None
         # This is going to be filled out
         final_goals = copy(initial_goals)
         # We randomize the allocation order to avoid bias
@@ -121,18 +148,21 @@ class CBSSolver:
             planned_paths: The already planned paths
             timestep: The simulation timestep
         """
+        # Get the dimensions, agents, and obstacles in the expected format
         dimension = map_instance.get_dim()
         agent_list = agents.get_agent_dict()
-        agent_list = self.set_unset_goals(
-            map_instance=map_instance, agent_list=agent_list
-        )
         obstacles = map_instance.get_obstacles()
-        env = Environment(dimension, agent_list, obstacles)
-        logging.info(f"agent_list: {agent_list}")
 
+        # Make sure there are no errors in the agent list
+        agent_list = self.fixup_goals(map_instance=map_instance, agent_list=agent_list)
+        # Create an environment and solver
+        env = Environment(dimension, agent_list, obstacles)
         cbs = CBS(env)
+        # Solve the CBS instance
         solution = cbs.search()
-        for agent_id, plan in solution.items():
+
+        # Set the paths for each agent
+        for agent_id in solution.keys():
             agents.agents[
                 agents.get_agent_from_id(agent_id)
             ].set_planned_path_from_plan(solution)
