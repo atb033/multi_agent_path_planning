@@ -6,12 +6,16 @@ author: Ashwin Bose (@atb033)
 
 """
 
-class AStar():
-    def __init__(self, env):
-        self.agent_dict = env.agent_dict
-        self.admissible_heuristic = env.admissible_heuristic
-        self.is_at_goal = env.is_at_goal
-        self.get_neighbors = env.get_neighbors
+from typing import TYPE_CHECKING
+
+from cbs.constraints import Constraints, VertexConstraint
+
+if TYPE_CHECKING:
+    from cbs.cbs import Environment
+
+class AStar:
+    def __init__(self, env: 'Environment'):
+        self.env = env
 
     def reconstruct_path(self, came_from, current):
         total_path = [current]
@@ -24,7 +28,7 @@ class AStar():
         """
         low level search 
         """
-        initial_state = self.agent_dict[agent_name]["start"]
+        initial_state = self.env.agent_dict[agent_name]["start"]
         step_cost = 1
         
         closed_set = set()
@@ -37,19 +41,19 @@ class AStar():
 
         f_score = {} 
 
-        f_score[initial_state] = self.admissible_heuristic(initial_state, agent_name)
+        f_score[initial_state] = self.env.admissible_heuristic(initial_state, agent_name)
 
         while open_set:
             temp_dict = {open_item:f_score.setdefault(open_item, float("inf")) for open_item in open_set}
             current = min(temp_dict, key=temp_dict.get)
 
-            if self.is_at_goal(current, agent_name):
+            if self.env.is_at_goal(current, agent_name):
                 return self.reconstruct_path(came_from, current)
 
             open_set -= {current}
             closed_set |= {current}
 
-            neighbor_list = self.get_neighbors(current)
+            neighbor_list = self.env.get_neighbors(current)
 
             for neighbor in neighbor_list:
                 if neighbor in closed_set:
@@ -65,6 +69,6 @@ class AStar():
                 came_from[neighbor] = current
 
                 g_score[neighbor] = tentative_g_score
-                f_score[neighbor] = g_score[neighbor] + self.admissible_heuristic(neighbor, agent_name)
+                f_score[neighbor] = g_score[neighbor] + self.env.admissible_heuristic(neighbor, agent_name)
         return False
 
