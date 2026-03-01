@@ -48,7 +48,12 @@ class AStar:
             current = min(temp_dict, key=temp_dict.get)
 
             if self.env.is_at_goal(current, agent_name):
-                return self.reconstruct_path(came_from, current)
+                conflict = any(
+                    vc.time >= current.time and vc.location == current.location
+                    for vc in self.env.constraints.vertex_constraints
+                )
+                if not conflict:
+                    return self.reconstruct_path(came_from, current)
 
             open_set -= {current}
             closed_set |= {current}
