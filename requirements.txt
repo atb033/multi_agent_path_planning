@@ -1,4 +1,8 @@
+lark
 numpy
 matplotlib
 scipy
 ffmpeg-python
+pyyaml
+pytest
+pytest-timeout
